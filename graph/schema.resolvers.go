@@ -8,12 +8,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bottlehub/unboard/configs"
 	"github.com/bottlehub/unboard/graph/model"
+)
+
+var (
+	db = configs.ConnectDB()
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	user, err := db.CreateUser(&input)
+	return user, err
 }
 
 // CreatePost is the resolver for the createPost field.
@@ -53,12 +59,14 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	users, err := db.GetUsers()
+	return users, err
 }
 
 // Posts is the resolver for the posts field.
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Posts - posts"))
+	posts, err := db.GetPosts()
+	return posts, err
 }
 
 // Comments is the resolver for the comments field.
