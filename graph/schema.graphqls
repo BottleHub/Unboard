@@ -13,15 +13,6 @@ type User {
   # @hasInverse(field: followers)
   followers: [User]
   # @hasInverse(field: following)
-  wallet: Wallet!
-}
-
-type Wallet {
-  id: ID!
-  privateKey: String!
-  privateAddress: String!
-  publicKey: String!
-  publicAddress: String!
 }
 
 type Post {
@@ -76,16 +67,6 @@ input FetchUser {
   id: String!
 }
 
-input NewUser {
-  username: String!
-  # @id
-  name: String!
-  about: String
-  email: String!
-  avatarImageURL: String!
-  password: String!
-}
-
 input FetchPost {
   id: String!
 }
@@ -107,8 +88,17 @@ input Login {
   password: String!
 }
 
+input NewUser {
+  username: String!
+  # @id
+  name: String!
+  about: String
+  email: String!
+  avatarImageURL: String!
+  password: String!
+}
+
 input NewPost {
-  _id: String!
   postedBy: ID!
   imageURL: String!
   description: String
@@ -116,14 +106,12 @@ input NewPost {
 }
 
 input NewComment {
-  _id: String!
   text: String!
   commentBy: ID!
   commentOn: ID!
 }
 
 input NewChatboard {
-  _id: String!
   name: String!
   imageURL: String!
   description: String
@@ -131,7 +119,6 @@ input NewChatboard {
 }
 
 input NewMessage {
-  _id: String!
   text: String
   fileURL: String
   messageBy: ID!
@@ -141,6 +128,26 @@ input NewMessage {
 input NewLink {
   title: String!
   address: String!
+}
+
+input DeleteUser {
+  id: String!
+}
+
+input DeletePost {
+  id: String!
+}
+
+input DeleteComment {
+  id: String!
+}
+
+input DeleteChatboard {
+  id: String!
+}
+
+input DeleteMessage {
+  id: String!
 }
 
 input RefreshTokenInput {
@@ -168,6 +175,11 @@ type Mutation {
   createChatboard(input: NewChatboard!): Chatboard!
   createMessage(input: NewMessage!): Message!
   createLink(input: NewLink!): Link!
+  deleteUser(input: DeleteUser!): User!
+  deletePost(input: DeletePost!): Post!
+  deleteComment(input: DeleteComment!): Comment!
+  deleteChatboard(input: DeleteChatboard!): Chatboard!
+  deleteMessage(input: DeleteMessage!): Message!
   login(input: Login!): String!
   refreshToken(input: RefreshTokenInput!): String!
 }
