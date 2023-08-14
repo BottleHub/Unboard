@@ -1,15 +1,37 @@
 package configs
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"log"
+	"time"
 
-// HashPassword hashes given password
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+	"github.com/dgrijalva/jwt-go"
+)
+
+// GenerateToken generates a jwt token and assign a username to it's claims and return it
+func GenerateToken(username string, secretKey string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	/* Create a map to store our claims */
+	claims := token.Claims.(jwt.MapClaims)
+	/* Set token claims */
+	claims["username"] = username
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		log.Fatal("Error in Generating key")
+		return "", err
+	}
+	return tokenString, nil
 }
 
-// CheckPassword hash compares raw password with it's hashed values
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+// ParseToken parses a jwt token and returns the username in it's claims
+func ParseToken(tokenStr string, secretKey string) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		username := claims["username"].(string)
+		return username, nil
+	} else {
+		return "", err
+	}
 }
