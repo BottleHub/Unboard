@@ -1,0 +1,249 @@
+# Types
+type User {
+  id: ID!
+  username: String!
+  # @id
+  name: String!
+  about: String
+  email: String!
+  avatarImageURL: String!
+  password: String!
+  posts: [Post!]
+  # @hasInverse(field: postedBy)
+  following: [User]
+  # @hasInverse(field: followers)
+  followers: [User]
+  # @hasInverse(field: following)
+}
+
+type Post {
+  id: ID!
+  postedBy: User!
+  imageURL: String!
+  description: String
+  likes: Int!
+  comments: [Comment!]
+  # @hasInverse(field: commentOn)
+}
+
+type Comment {
+  id: String!
+  text: String!
+  commentBy: User!
+  commentOn: Post!
+}
+
+type Chatboard {
+  id: ID!
+  name: String!
+  imageURL: String!
+  description: String
+  members: [User!]
+  messages: [Message!]
+  # @hasInverse(field: commentOn)
+}
+
+type Message {
+  id: ID!
+  text: String
+  fileURL: String
+  messageBy: User!
+  messageOn: Chatboard!
+}
+
+type Link {
+  id: ID!
+  title: String!
+  address: String!
+  user: User!
+}
+
+# Enums
+enum Status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+# Inputs Fetch
+input FetchUser {
+  id: String!
+}
+
+input FetchPost {
+  id: String!
+}
+
+input FetchComment {
+  id: String!
+}
+
+input FetchChatboard {
+  id: String!
+}
+
+input FetchMessage {
+  id: String!
+}
+
+# Input Create
+input NewUser {
+  username: String!
+  # @id
+  name: String!
+  about: String
+  email: String!
+  avatarImageURL: String!
+  password: String!
+}
+
+input NewPost {
+  postedBy: ID!
+  imageURL: String!
+  description: String
+  likes: Int!
+}
+
+input NewComment {
+  text: String!
+  commentBy: ID!
+  commentOn: ID!
+}
+
+input NewChatboard {
+  name: String!
+  imageURL: String!
+  description: String
+  # @hasInverse(field: commentOn)
+}
+
+input NewMessage {
+  text: String
+  fileURL: String
+  messageBy: ID!
+  messageOn: ID!
+}
+
+input NewLink {
+  title: String!
+  address: String!
+}
+
+# Input Update
+input UpdateUser {
+  username: String
+  # @id
+  name: String
+  about: String
+  email: String
+  avatarImageURL: String
+  password: String
+  posts: [Post!]
+  # @hasInverse(field: postedBy)
+  following: [User]
+  # @hasInverse(field: followers)
+  followers: [User]
+  # @hasInverse(field: following)
+}
+
+input UpdateComment {
+  text: String
+}
+
+input UpdateChatboard {
+  name: String
+  imageURL: String
+  description: String
+  members: [User!]
+  messages: [Message!]
+  # @hasInverse(field: commentOn)
+}
+
+input UpdateMessage {
+  text: String
+  fileURL: String
+}
+
+input UpdateLink {
+  title: String
+  address: String
+}
+
+# Input Delete
+input DeleteUser {
+  id: String!
+}
+
+input DeletePost {
+  id: String!
+}
+
+input DeleteComment {
+  id: String!
+}
+
+input DeleteChatboard {
+  id: String!
+}
+
+input DeleteMessage {
+  id: String!
+}
+
+input DeleteLink {
+  id: String!
+}
+
+# Misc
+input Login {
+  username: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  token: String!
+}
+
+# Queries and Mutations
+type Query {
+  # Multiple Queries
+  users: [User!]!
+  posts: [Post!]!
+  comments: [Comment!]!
+  chatboards: [Chatboard!]!
+  messages: [Message!]!
+  # Single Queries
+  user(input: FetchUser): User!
+  post(input: FetchPost): Post!
+  comment(input: FetchComment!): Comment!
+  chatboard(input: FetchChatboard!): Chatboard!
+  message(input: FetchMessage!): Message!
+  links: [Link!]!
+}
+
+type Mutation {
+  # Create
+  createUser(input: NewUser!): User!
+  createPost(input: NewPost!): Post!
+  createComment(input: NewComment!): Comment!
+  createChatboard(input: NewChatboard!): Chatboard!
+  createMessage(input: NewMessage!): Message!
+  createLink(input: NewLink!): Link!
+  # Update
+  updateUser(id: ID!, input: UpdateUser!): User!
+  updatePost(id: ID!, input: UpdatePost!): Post!
+  updateComment(id: ID!, input: UpdateComment!): Comment!
+  updateChatboard(id: ID!, input: UpdateChatboard!): Chatboard!
+  updateMessage(id: ID!, input: UpdateMessage!): Message!
+  updateLink(id: ID!, input: UpdateLink!): Link!
+  # Delete
+  deleteUser(id: ID!): DeleteUser!
+  deletePost(id: ID!): DeletePost!
+  deleteComment(id: ID!): DeleteComment!
+  deleteChatboard(id: ID!): DeleteChatboard!
+  deleteMessage(id: ID!): DeleteMessage!
+  deleteLink(id: ID!): DeleteLink!
+  # Misc
+  login(input: Login!): String!
+  refreshToken(input: RefreshTokenInput!): String!
+}
