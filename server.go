@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bottlehub/unboard/configs/auth"
 	"github.com/bottlehub/unboard/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
 )
 
 const defaultPort = "8080"
@@ -18,6 +20,10 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	router := chi.NewRouter()
+
+	router.Use(auth.Middleware("phrase"))
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 

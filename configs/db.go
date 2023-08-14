@@ -18,6 +18,12 @@ type DB struct {
 	client *mongo.Client
 }
 
+type User struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func ConnectDB() *DB {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
@@ -266,6 +272,15 @@ func (db *DB) SingleUser(ID string) (*model.User, error) {
 	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&user)
 
 	return user, err
+}
+
+func (db *DB) GetUserIdByUsername(username string) (string, error) {
+	collection, ctx := db.ctxDeferHelper("users")
+	var user *model.User
+
+	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	id := user.ID
+	return id, err
 }
 
 func (db *DB) SingleChatboard(ID string) (*model.Chatboard, error) {
