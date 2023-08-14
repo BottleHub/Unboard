@@ -1,0 +1,11 @@
+# General
+*.md
+
+# Logs
+logs
+*.log
+
+# Local env files
+.env
+.env.*
+!.env.example
