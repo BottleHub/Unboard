@@ -24,22 +24,26 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+	post, err := db.CreatePost(&input)
+	return post, err
 }
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: CreateComment - createComment"))
+	comment, err := db.CreateComment(&input)
+	return comment, err
 }
 
 // CreateChatboard is the resolver for the createChatboard field.
 func (r *mutationResolver) CreateChatboard(ctx context.Context, input model.NewChatboard) (*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: CreateChatboard - createChatboard"))
+	chatboard, err := db.CreateChatboard(&input)
+	return chatboard, err
 }
 
 // CreateMessage is the resolver for the createMessage field.
 func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: CreateMessage - createMessage"))
+	message, err := db.CreateMessage(&input)
+	return message, err
 }
 
 // CreateLink is the resolver for the createLink field.
@@ -71,42 +75,50 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 
 // Comments is the resolver for the comments field.
 func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
+	comments, err := db.GetComments()
+	return comments, err
 }
 
 // Chatboards is the resolver for the chatboards field.
 func (r *queryResolver) Chatboards(ctx context.Context) ([]*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: Chatboards - chatboards"))
+	chatboard, err := db.GetChatboards()
+	return chatboard, err
 }
 
 // Messages is the resolver for the messages field.
 func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
-	panic(fmt.Errorf("not implemented: Messages - messages"))
+	messages, err := db.GetMessages()
+	return messages, err
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, input *model.FetchUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	user, err := db.SingleUser(input.ID)
+	return user, err
 }
 
 // Post is the resolver for the post field.
 func (r *queryResolver) Post(ctx context.Context, input *model.FetchPost) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Post - post"))
+	post, err := db.SinglePost(input.ID)
+	return post, err
 }
 
 // Comment is the resolver for the comment field.
 func (r *queryResolver) Comment(ctx context.Context, input model.FetchComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comment - comment"))
+	comment, err := db.SingleComment(input.ID)
+	return comment, err
 }
 
 // Chatboard is the resolver for the chatboard field.
 func (r *queryResolver) Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: Chatboard - chatboard"))
+	chatboard, err := db.SingleChatboard(input.ID)
+	return chatboard, err
 }
 
 // Message is the resolver for the message field.
 func (r *queryResolver) Message(ctx context.Context, input model.FetchMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: Message - message"))
+	message, err := db.SingleMessage(input.ID)
+	return message, err
 }
 
 // Links is the resolver for the links field.

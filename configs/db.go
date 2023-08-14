@@ -65,6 +65,19 @@ func (db *DB) resErrHelper(collectionName string, input any) (*mongo.InsertOneRe
 	return res, err
 }
 
+func (db *DB) multipleFetchHelper(collectionName string) *mongo.Cursor {
+	collection, ctx := db.ctxDeferHelper(collectionName)
+
+	res, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer res.Close(ctx)
+
+	return res
+}
+
 func (db *DB) CreateComment(input *model.NewComment) (*model.Comment, error) {
 	res, err := db.resErrHelper("comments", input)
 
@@ -136,7 +149,6 @@ func (db *DB) GetComments() ([]*model.Comment, error) {
 	var comments []*model.Comment
 
 	res, err := collection.Find(ctx, bson.M{})
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -158,7 +170,6 @@ func (db *DB) GetPosts() ([]*model.Post, error) {
 	var posts []*model.Post
 
 	res, err := collection.Find(ctx, bson.M{})
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -176,44 +187,28 @@ func (db *DB) GetPosts() ([]*model.Post, error) {
 }
 
 func (db *DB) GetUsers() ([]*model.User, error) {
-	collection, ctx := db.ctxDeferHelper("users")
-	var users []*model.User
+	res := db.multipleFetchHelper("users")
+	var (
+		users []*model.User
+		err   error
+	)
 
-	res, err := collection.Find(ctx, bson.M{})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer res.Close(ctx)
-	for res.Next(ctx) {
-		var singleUser *model.User
-		if err = res.Decode(&singleUser); err != nil {
-			log.Fatal(err)
-		}
-		users = append(users, singleUser)
+	if err = res.All(context.TODO(), users); err != nil {
+		panic(err)
 	}
 
 	return users, err
 }
 
 func (db *DB) GetChatboards() ([]*model.Chatboard, error) {
-	collection, ctx := db.ctxDeferHelper("chatboards")
-	var chatboards []*model.Chatboard
+	res := db.multipleFetchHelper("chatboards")
+	var (
+		chatboards []*model.Chatboard
+		err        error
+	)
 
-	res, err := collection.Find(ctx, bson.M{})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer res.Close(ctx)
-	for res.Next(ctx) {
-		var singleChatboard *model.Chatboard
-		if err = res.Decode(&singleChatboard); err != nil {
-			log.Fatal(err)
-		}
-		chatboards = append(chatboards, singleChatboard)
+	if err = res.All(context.TODO(), chatboards); err != nil {
+		panic(err)
 	}
 
 	return chatboards, err
@@ -224,7 +219,6 @@ func (db *DB) GetMessages() ([]*model.Message, error) {
 	var messages []*model.Message
 
 	res, err := collection.Find(ctx, bson.M{})
-
 	if err != nil {
 		log.Fatal(err)
 	}
