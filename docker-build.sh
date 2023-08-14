@@ -1,1 +1,1 @@
-docker build -t LordEwan/Unboard:{1}
+docker build -t lordewan/unboard:0.0.1 .
