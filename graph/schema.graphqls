@@ -19,7 +19,7 @@ type User {
 type Post {
   id: ID!
   postedBy: User!
-  imageURL: String!
+  imageURL: String
   description: String
   likes: Int!
   comments: [Comment!]
@@ -144,6 +144,12 @@ input UpdateUser {
   # @hasInverse(field: followers)
   followers: [User]
   # @hasInverse(field: following)
+}
+
+input UpdatePost {
+  likes: Int
+  comments: [Comment!]
+  # @hasInverse(field: commentOn)
 }
 
 input UpdateComment {
