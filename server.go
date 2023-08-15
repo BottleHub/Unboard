@@ -45,8 +45,8 @@ func main() {
 	route.GET("/")
 	routes.Route(route)
 
-	route.POST("/query", graphqlHandler())
 	route.GET("/graphql", playgroundHandler())
+	route.POST("/query", graphqlHandler())
 
 	log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
 	log.Fatal(route.Run("localhost:" + port))
