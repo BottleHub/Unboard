@@ -41,12 +41,13 @@ func main() {
 	router.Use(auth.Middleware("phrase"))
 
 	route := gin.Default()
-	// REST
+
 	route.GET("/")
 	routes.Route(route)
 
 	route.POST("/query", graphqlHandler())
 	route.GET("/graphql", playgroundHandler())
-	log.Printf("Connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(route.Run(port))
+
+	log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
+	log.Fatal(route.Run("localhost:" + port))
 }
