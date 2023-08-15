@@ -19,7 +19,7 @@ type User {
 type Post {
   id: ID!
   postedBy: User!
-  imageURL: String!
+  imageURL: String
   description: String
   likes: Int!
   comments: [Comment!]
@@ -56,6 +56,30 @@ type Link {
   title: String!
   address: String!
   user: User!
+}
+
+type DeleteUser {
+  id: String!
+}
+
+type DeletePost {
+  id: String!
+}
+
+type DeleteComment {
+  id: String!
+}
+
+type DeleteChatboard {
+  id: String!
+}
+
+type DeleteMessage {
+  id: String!
+}
+
+type DeleteLink {
+  id: String!
 }
 
 # Enums
@@ -138,12 +162,18 @@ input UpdateUser {
   email: String
   avatarImageURL: String
   password: String
-  posts: [Post!]
-  # @hasInverse(field: postedBy)
-  following: [User]
-  # @hasInverse(field: followers)
-  followers: [User]
+  # posts: [Post!]
+  # # @hasInverse(field: postedBy)
+  # following: [User]
+  # # @hasInverse(field: followers)
+  # followers: [User]
   # @hasInverse(field: following)
+}
+
+input UpdatePost {
+  likes: Int
+  # comments: [Comment!]
+  # @hasInverse(field: commentOn)
 }
 
 input UpdateComment {
@@ -154,8 +184,8 @@ input UpdateChatboard {
   name: String
   imageURL: String
   description: String
-  members: [User!]
-  messages: [Message!]
+  # members: [User!]
+  # messages: [Message!]
   # @hasInverse(field: commentOn)
 }
 
@@ -167,31 +197,6 @@ input UpdateMessage {
 input UpdateLink {
   title: String
   address: String
-}
-
-# Input Delete
-input DeleteUser {
-  id: String!
-}
-
-input DeletePost {
-  id: String!
-}
-
-input DeleteComment {
-  id: String!
-}
-
-input DeleteChatboard {
-  id: String!
-}
-
-input DeleteMessage {
-  id: String!
-}
-
-input DeleteLink {
-  id: String!
 }
 
 # Misc

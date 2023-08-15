@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/bottlehub/unboard/configs/auth"
 	"github.com/bottlehub/unboard/graph"
+	"github.com/bottlehub/unboard/routes"
+	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -15,7 +16,19 @@ import (
 
 const defaultPort = "8080"
 
-var handle http.HandlerFunc
+func graphqlHandler() gin.HandlerFunc {
+	handle := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	return func(c *gin.Context) {
+		handle.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+func playgroundHandler() gin.HandlerFunc {
+	handle := playground.Handler("GraphQL", "/query")
+	return func(c *gin.Context) {
+		handle.ServeHTTP(c.Writer, c.Request)
+	}
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -27,13 +40,14 @@ func main() {
 
 	router.Use(auth.Middleware("phrase"))
 
-	http.Handle("/api", handle)
+	route := gin.Default()
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	route.GET("/")
+	routes.Route(route)
 
-	http.Handle("/graphql", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	route.GET("/graphql", playgroundHandler())
+	route.POST("/query", graphqlHandler())
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
+	log.Fatal(route.Run("localhost:" + port))
 }
