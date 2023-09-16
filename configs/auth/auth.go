@@ -24,7 +24,7 @@ func Middleware(secretKey string) func(http.Handler) http.Handler {
 				return
 			}
 
-			//validate jwt token
+			// Validate jwt token
 			tokenStr := header
 			username, err := configs.ParseToken(tokenStr, secretKey)
 			if err != nil {
@@ -32,7 +32,7 @@ func Middleware(secretKey string) func(http.Handler) http.Handler {
 				return
 			}
 
-			// create user and check if user exists in db
+			// Create user and check if user exists in db
 			user := configs.User{Username: username}
 			id, err := configs.ConnectDB().GetUserIdByUsername(username)
 			if err != nil {
@@ -40,18 +40,17 @@ func Middleware(secretKey string) func(http.Handler) http.Handler {
 				return
 			}
 			user.ID = id
-			// put it in context
 			ctx := context.WithValue(r.Context(), userCtxKey, &user)
 
-			// and call the next with our new context
+			// Call the next with our new context
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
 	}
 }
 
-// ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *configs.User {
+// Finds the user from the context. REQUIRES Middleware to have run.
+func FromContext(ctx context.Context) *configs.User {
 	raw, _ := ctx.Value(userCtxKey).(*configs.User)
 	return raw
 }

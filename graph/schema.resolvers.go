@@ -126,6 +126,66 @@ func (r *queryResolver) Links(ctx context.Context) ([]*model.Link, error) {
 	panic(fmt.Errorf("not implemented: Links - links"))
 }
 
+// DeleteChatboard implements MutationResolver.
+func (*mutationResolver) DeleteChatboard(ctx context.Context, id string) (*model.DeleteChatboard, error) {
+	panic("unimplemented")
+}
+
+// DeleteComment implements MutationResolver.
+func (*mutationResolver) DeleteComment(ctx context.Context, id string) (*model.DeleteComment, error) {
+	panic("unimplemented")
+}
+
+// DeleteLink implements MutationResolver.
+func (*mutationResolver) DeleteLink(ctx context.Context, id string) (*model.DeleteLink, error) {
+	panic("unimplemented")
+}
+
+// DeleteMessage implements MutationResolver.
+func (*mutationResolver) DeleteMessage(ctx context.Context, id string) (*model.DeleteMessage, error) {
+	panic("unimplemented")
+}
+
+// DeletePost implements MutationResolver.
+func (*mutationResolver) DeletePost(ctx context.Context, id string) (*model.DeletePost, error) {
+	panic("unimplemented")
+}
+
+// DeleteUser implements MutationResolver.
+func (*mutationResolver) DeleteUser(ctx context.Context, id string) (*model.DeleteUser, error) {
+	panic("unimplemented")
+}
+
+// UpdateChatboard implements MutationResolver.
+func (*mutationResolver) UpdateChatboard(ctx context.Context, id string, input model.UpdateChatboard) (*model.Chatboard, error) {
+	panic("unimplemented")
+}
+
+// UpdateComment implements MutationResolver.
+func (*mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateComment) (*model.Comment, error) {
+	panic("unimplemented")
+}
+
+// UpdateLink implements MutationResolver.
+func (*mutationResolver) UpdateLink(ctx context.Context, id string, input model.UpdateLink) (*model.Link, error) {
+	panic("unimplemented")
+}
+
+// UpdateMessage implements MutationResolver.
+func (*mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
+	panic("unimplemented")
+}
+
+// UpdatePost implements MutationResolver.
+func (*mutationResolver) UpdatePost(ctx context.Context, id string, input model.UpdatePost) (*model.Post, error) {
+	panic("unimplemented")
+}
+
+// UpdateUser implements MutationResolver.
+func (*mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUser) (*model.User, error) {
+	panic("unimplemented")
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -133,4 +193,5 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
+
 type queryResolver struct{ *Resolver }
