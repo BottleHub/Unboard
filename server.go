@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/bottlehub/unboard/configs/auth"
+	"github.com/bottlehub/unboard/auth"
 	"github.com/bottlehub/unboard/graph"
 	"github.com/bottlehub/unboard/routes"
 	"github.com/gin-gonic/gin"
