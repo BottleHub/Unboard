@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 
+COPY . .
+
 RUN go mod download
 
 RUN go build -o /app/build
-
-COPY *.go ./
 
 ENV PORT=8080
 
