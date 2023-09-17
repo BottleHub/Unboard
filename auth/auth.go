@@ -54,3 +54,7 @@ func FromContext(ctx context.Context) *configs.User {
 	raw, _ := ctx.Value(userCtxKey).(*configs.User)
 	return raw
 }
+
+func main() {
+	
+}
