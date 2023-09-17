@@ -1,0 +1,21 @@
+name: Test Boards
+
+on:
+  [push]
+
+jobs:
+    test-boards:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup Go
+              uses: actions/setup-go@v4
+              with:
+                go-version: '1.21.x'
+                cache-dependency-path: subdir/go.sum
+            - name: Install dependencies
+              run: go mod download
+              working-directory: ./boards
+            #- name: Test
+            #  run: go test -v ./...
+            #  working-directory: ./boards
