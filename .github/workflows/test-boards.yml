@@ -15,3 +15,6 @@ jobs:
             - name: Install dependencies
               run: go mod download
               working-directory: ./boards
+            #- name: Test
+            #  run: go test -v ./...
+            #  working-directory: ./boards
