@@ -19,7 +19,7 @@ func EnvMongoURI() string {
 	return os.Getenv("MONGOURI")
 }
 
-// Helps retrieve the RabbitMQ address fron the env file
+// Helps retrieve the RabbitMQ AMQP address fron the env file
 func EnvRabbitMQ() string {
 	env, err := os.LookupEnv("RABBITMQ")
 	if !err {
