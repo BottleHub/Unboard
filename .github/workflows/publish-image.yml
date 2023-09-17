@@ -1,6 +1,7 @@
 name: Publish Image to Docker Hub
 on:
-  [push, pull_request]
+  pull_request:
+    branches: [ master ]
 
 jobs:
     publish_image:
