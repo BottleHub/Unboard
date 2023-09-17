@@ -24,6 +24,30 @@ type Comment struct {
 	CommentOn *Post  `json:"commentOn"`
 }
 
+type DeleteChatboard struct {
+	ID string `json:"id"`
+}
+
+type DeleteComment struct {
+	ID string `json:"id"`
+}
+
+type DeleteLink struct {
+	ID string `json:"id"`
+}
+
+type DeleteMessage struct {
+	ID string `json:"id"`
+}
+
+type DeletePost struct {
+	ID string `json:"id"`
+}
+
+type DeleteUser struct {
+	ID string `json:"id"`
+}
+
 type FetchChatboard struct {
 	ID string `json:"id"`
 }
@@ -65,14 +89,12 @@ type Message struct {
 }
 
 type NewChatboard struct {
-	ID          string  `json:"_id"`
 	Name        string  `json:"name"`
 	ImageURL    string  `json:"imageURL"`
 	Description *string `json:"description,omitempty"`
 }
 
 type NewComment struct {
-	ID        string `json:"_id"`
 	Text      string `json:"text"`
 	CommentBy string `json:"commentBy"`
 	CommentOn string `json:"commentOn"`
@@ -84,7 +106,6 @@ type NewLink struct {
 }
 
 type NewMessage struct {
-	ID        string  `json:"_id"`
 	Text      *string `json:"text,omitempty"`
 	FileURL   *string `json:"fileURL,omitempty"`
 	MessageBy string  `json:"messageBy"`
@@ -92,9 +113,8 @@ type NewMessage struct {
 }
 
 type NewPost struct {
-	ID          string  `json:"_id"`
 	PostedBy    string  `json:"postedBy"`
-	ImageURL    string  `json:"imageURL"`
+	ImageURL    *string `json:"imageURL,omitempty"`
 	Description *string `json:"description,omitempty"`
 	Likes       int     `json:"likes"`
 }
@@ -111,7 +131,7 @@ type NewUser struct {
 type Post struct {
 	ID          string     `json:"id"`
 	PostedBy    *User      `json:"postedBy"`
-	ImageURL    string     `json:"imageURL"`
+	ImageURL    *string    `json:"imageURL,omitempty"`
 	Description *string    `json:"description,omitempty"`
 	Likes       int        `json:"likes"`
 	Comments    []*Comment `json:"comments,omitempty"`
@@ -119,6 +139,39 @@ type Post struct {
 
 type RefreshTokenInput struct {
 	Token string `json:"token"`
+}
+
+type UpdateChatboard struct {
+	Name        *string `json:"name,omitempty"`
+	ImageURL    *string `json:"imageURL,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type UpdateComment struct {
+	Text *string `json:"text,omitempty"`
+}
+
+type UpdateLink struct {
+	Title   *string `json:"title,omitempty"`
+	Address *string `json:"address,omitempty"`
+}
+
+type UpdateMessage struct {
+	Text    *string `json:"text,omitempty"`
+	FileURL *string `json:"fileURL,omitempty"`
+}
+
+type UpdatePost struct {
+	Likes *int `json:"likes,omitempty"`
+}
+
+type UpdateUser struct {
+	Username       *string `json:"username,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	About          *string `json:"about,omitempty"`
+	Email          *string `json:"email,omitempty"`
+	AvatarImageURL *string `json:"avatarImageURL,omitempty"`
+	Password       *string `json:"password,omitempty"`
 }
 
 type User struct {
@@ -132,15 +185,6 @@ type User struct {
 	Posts          []*Post `json:"posts,omitempty"`
 	Following      []*User `json:"following,omitempty"`
 	Followers      []*User `json:"followers,omitempty"`
-	Wallet         *Wallet `json:"wallet"`
-}
-
-type Wallet struct {
-	ID             string `json:"id"`
-	PrivateKey     string `json:"privateKey"`
-	PrivateAddress string `json:"privateAddress"`
-	PublicKey      string `json:"publicKey"`
-	PublicAddress  string `json:"publicAddress"`
 }
 
 type Status string

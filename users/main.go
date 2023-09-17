@@ -16,6 +16,7 @@ import (
 
 const defaultPort = "8080"
 
+// GraphQL handle helper
 func graphqlHandler() gin.HandlerFunc {
 	handle := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	return func(c *gin.Context) {
@@ -23,6 +24,7 @@ func graphqlHandler() gin.HandlerFunc {
 	}
 }
 
+// Redirects to fetching the graphql handle
 func playgroundHandler() gin.HandlerFunc {
 	handle := playground.Handler("GraphQL", "/query")
 	return func(c *gin.Context) {
@@ -30,6 +32,7 @@ func playgroundHandler() gin.HandlerFunc {
 	}
 }
 
+// Starts the server process
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -45,9 +48,9 @@ func main() {
 	route.GET("/")
 	routes.Route(route)
 
-	route.GET("/graphql", playgroundHandler())
 	route.POST("/query", graphqlHandler())
+	route.GET("/graphql", playgroundHandler())
 
 	log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
-	log.Fatal(route.Run("localhost:" + port))
+	log.Fatal(route.Run(":" + port))
 }

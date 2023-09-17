@@ -53,7 +53,7 @@ func colHelper(db *DB, collectionName string) *mongo.Collection {
 
 func (db *DB) ctxDeferHelper(collectionName string) (*mongo.Collection, context.Context) {
 	collection := colHelper(db, collectionName)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	fmt.Println(cancel)
 
 	return collection, ctx
@@ -151,42 +151,28 @@ func (db *DB) CreateMessage(input *model.NewMessage) (*model.Message, error) {
 }
 
 func (db *DB) GetComments() ([]*model.Comment, error) {
-	collection, ctx := db.ctxDeferHelper("comments")
-	var comments []*model.Comment
+	res := db.multipleFetchHelper("comments")
+	var (
+		comments []*model.Comment
+		err      error
+	)
 
-	res, err := collection.Find(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer res.Close(ctx)
-	for res.Next(ctx) {
-		var singleComment *model.Comment
-		if err = res.Decode(&singleComment); err != nil {
-			log.Fatal(err)
-		}
-		comments = append(comments, singleComment)
+	if err = res.All(context.TODO(), comments); err != nil {
+		panic(err)
 	}
 
 	return comments, err
 }
 
 func (db *DB) GetPosts() ([]*model.Post, error) {
-	collection, ctx := db.ctxDeferHelper("posts")
-	var posts []*model.Post
+	res := db.multipleFetchHelper("posts")
+	var (
+		posts []*model.Post
+		err   error
+	)
 
-	res, err := collection.Find(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer res.Close(ctx)
-	for res.Next(ctx) {
-		var singlePost *model.Post
-		if err = res.Decode(&singlePost); err != nil {
-			log.Fatal(err)
-		}
-		posts = append(posts, singlePost)
+	if err = res.All(context.TODO(), posts); err != nil {
+		panic(err)
 	}
 
 	return posts, err
@@ -221,21 +207,14 @@ func (db *DB) GetChatboards() ([]*model.Chatboard, error) {
 }
 
 func (db *DB) GetMessages() ([]*model.Message, error) {
-	collection, ctx := db.ctxDeferHelper("messages")
-	var messages []*model.Message
+	res := db.multipleFetchHelper("messages")
+	var (
+		messages []*model.Message
+		err      error
+	)
 
-	res, err := collection.Find(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer res.Close(ctx)
-	for res.Next(ctx) {
-		var singleMessage *model.Message
-		if err = res.Decode(&singleMessage); err != nil {
-			log.Fatal(err)
-		}
-		messages = append(messages, singleMessage)
+	if err = res.All(context.TODO(), messages); err != nil {
+		panic(err)
 	}
 
 	return messages, err
@@ -303,4 +282,16 @@ func (db *DB) SingleMessage(ID string) (*model.Message, error) {
 	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&message)
 
 	return message, err
+}
+
+func (db *DB) DeletedComment(ID string) (*model.DeleteComment, error) {
+	collection, ctx := db.ctxDeferHelper("comments")
+
+	_id, _ := primitive.ObjectIDFromHex(ID)
+	filter := bson.M{"_id": _id}
+	_, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &model.DeleteComment{ID: ID}, err
 }
