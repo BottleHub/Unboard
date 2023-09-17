@@ -20,7 +20,7 @@ func EnvMongoURI() string {
 }
 
 func EnvRabbitMQ() string {
-	env, err := os.LookupEnv("RBBITMQ")
+	env, err := os.LookupEnv("RABBITMQ")
 	if !err {
 		err := godotenv.Load()
 		if err != nil {
@@ -29,7 +29,7 @@ func EnvRabbitMQ() string {
 				log.Fatal("Error loading .env file: ", err)
 			}
 		}
-		return os.Getenv("RABBTMQ")
+		return os.Getenv("RABBITMQ")
 	}
 	return env
 }
