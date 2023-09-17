@@ -11,7 +11,10 @@ import (
 func EnvMongoURI() string {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		err := godotenv.Load(".env.test")
+		if err != nil {
+			log.Fatal("Error loading .env file: ", err)
+		}
 	}
 	return os.Getenv("MONGOURI")
 }
@@ -19,7 +22,10 @@ func EnvMongoURI() string {
 func EnvRabbitMQ() string {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		err := godotenv.Load(".env.test")
+		if err != nil {
+			log.Fatal("Error loading .env file: ", err)
+		}
 	}
 	return os.Getenv("RABBITMQ")
 }
