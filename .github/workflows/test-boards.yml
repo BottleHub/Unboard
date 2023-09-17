@@ -1,4 +1,4 @@
-name: Publish Image to Docker Hub
+name: Test Boards
 
 on:
   [push]
