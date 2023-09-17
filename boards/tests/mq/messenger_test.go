@@ -11,5 +11,5 @@ func TestPublish(t *testing.T) {
 	if !err {
 		log.Fatal("Error loading .env file: ", err)
 	}
-	log.Println(env)
+	log.Fatal(env)
 }
