@@ -2,7 +2,6 @@ package mq
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/bottlehub/unboard/boards/configs"
 	"github.com/streadway/amqp"
@@ -11,7 +10,7 @@ import (
 func Connect() *amqp.Channel {
 	connection, err := amqp.Dial(configs.EnvRabbitMQ())
 	if err != nil {
-		log.Fatal(configs.EnvRabbitMQ())
+		panic(err)
 	}
 
 	fmt.Println("Connected to RabbitMQ Insatnce Successfully")
