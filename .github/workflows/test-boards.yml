@@ -19,5 +19,5 @@ jobs:
         env:
             MONGOURI: ${{ secrets.MONGOURI }}
             RABBITMQ: ${{ secrets.RABBITMQ }}
-        run: echo ${{ secrets.MONGOURI }}
+        run: go test -v ./...
         working-directory: ./boards
