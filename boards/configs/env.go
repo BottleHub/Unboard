@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -28,6 +29,7 @@ func EnvRabbitMQ() string {
 			if !err {
 				log.Fatal("Error loading .env file: ", err)
 			}
+			fmt.Println(env)
 			return env
 		}
 	}
