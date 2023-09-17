@@ -31,5 +31,6 @@ func EnvRabbitMQ() string {
 		}
 		return os.Getenv("RABBITMQ")
 	}
+	log.Println(env)
 	return env
 }
