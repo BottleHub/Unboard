@@ -12,7 +12,9 @@ jobs:
             - name: build
               run: |
                 docker build . -t lordewan/boards:latest
+              working-directory: ./boards
             - name: publish
               run: |
                 docker login -u lordewan -p ${{ secrets.DOCKERHUB_TOKEN }}
                 docker push lordewan/boards:latest
+              working-directory: ./boards
