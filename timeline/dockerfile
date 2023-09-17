@@ -1,0 +1,17 @@
+FROM golang:1.21
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+COPY . .
+
+RUN go mod download
+
+RUN go build -o /app/build
+
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["app/build"]
