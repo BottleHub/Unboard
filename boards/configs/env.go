@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -25,12 +24,7 @@ func EnvRabbitMQ() string {
 	if err != nil {
 		err := godotenv.Load(".env.test")
 		if err != nil {
-			env, err := os.LookupEnv("RABBITMQ")
-			if !err {
-				log.Fatal("Error loading .env file: ", err)
-			}
-			fmt.Println(env)
-			return env
+			log.Fatal("Error loading .env file: ", err)
 		}
 	}
 	return os.Getenv("RABBITMQ")
