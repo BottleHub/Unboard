@@ -6,12 +6,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func Test() {
+func Publish(queue string, message string) (int, error) {
 	channel := Connect()
 	defer channel.Close()
 
 	q, err := channel.QueueDeclare(
-		"TestQueue",
+		queue,
 		false,
 		false,
 		false,
@@ -19,24 +19,31 @@ func Test() {
 		nil,
 	)
 	if err != nil {
-		panic(err)
+		ch := make(chan string)
+		go panic(err)
+		<-ch
+		return 1, err
 	}
 
 	fmt.Println(q)
 
 	err = channel.Publish(
 		"",
-		"TestQueue",
+		queue,
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte("Testing..."),
+			ContentType: "text/json",
+			Body:        []byte(message),
 		},
 	)
 	if err != nil {
-		panic(err)
+		ch := make(chan string)
+		go panic(err)
+		<-ch
+		return 2, err
 	}
 
 	fmt.Println("Published Message to Queue")
+	return 0, err
 }
