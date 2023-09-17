@@ -1,0 +1,108 @@
+# Types
+type User {
+  id: ID!
+  username: String!
+  # @id
+  name: String!
+  about: String
+  avatarImageURL: String!
+  # @hasInverse(field: postedBy)
+  following: [User]
+  # @hasInverse(field: followers)
+  followers: [User]
+  # @hasInverse(field: following)
+}
+
+type Chatboard {
+  id: ID!
+  name: String!
+  imageURL: String!
+  description: String
+  members: [User!]
+  messages: [Message!]
+  # @hasInverse(field: commentOn)
+}
+
+type Message {
+  id: ID!
+  text: String
+  fileURL: String
+  messageBy: User!
+  messageOn: Chatboard!
+}
+
+type DeleteChatboard {
+  id: String!
+}
+
+type DeleteMessage {
+  id: String!
+}
+
+# Enums
+enum Status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+# Inputs Fetch
+input FetchChatboard {
+  id: String!
+}
+
+input FetchMessage {
+  id: String!
+}
+
+# Input Create
+input NewChatboard {
+  name: String!
+  imageURL: String!
+  description: String
+  # @hasInverse(field: commentOn)
+}
+
+input NewMessage {
+  text: String
+  fileURL: String
+  messageBy: ID!
+  messageOn: ID!
+}
+
+# Input Update
+input UpdateChatboard {
+  name: String
+  imageURL: String
+  description: String
+  # members: [User!]
+  # messages: [Message!]
+  # @hasInverse(field: commentOn)
+}
+
+input UpdateMessage {
+  text: String
+  fileURL: String
+}
+
+# Queries and Mutations
+type Query {
+  # Multiple Queries
+  chatboards: [Chatboard!]!
+  messages: [Message!]!
+  # Single Queries
+  chatboard(input: FetchChatboard!): Chatboard!
+  message(input: FetchMessage!): Message!
+}
+
+type Mutation {
+  # Create
+  createChatboard(input: NewChatboard!): Chatboard!
+  createMessage(input: NewMessage!): Message!
+  # Update
+  updateChatboard(id: ID!, input: UpdateChatboard!): Chatboard!
+  updateMessage(id: ID!, input: UpdateMessage!): Message!
+  # Delete
+  deleteChatboard(id: ID!): DeleteChatboard!
+  deleteMessage(id: ID!): DeleteMessage!
+}
