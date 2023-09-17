@@ -11,7 +11,7 @@ import (
 func Connect() *amqp.Channel {
 	connection, err := amqp.Dial(configs.EnvRabbitMQ())
 	if err != nil {
-		log.Fatal(err, configs.EnvRabbitMQ())
+		log.Fatal(configs.EnvRabbitMQ())
 	}
 
 	fmt.Println("Connected to RabbitMQ Insatnce Successfully")
