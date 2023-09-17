@@ -1,7 +1,7 @@
 name: Publish Image to Docker Hub
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
     publish_image:
@@ -14,4 +14,5 @@ jobs:
                 docker build . -t lordewan/boards:latest
             - name: publish
               run: |
+                docker login -u lordewan -p ${{ secrets.DOCKERHUB_TOKEN }}
                 docker push lordewan/boards:latest
