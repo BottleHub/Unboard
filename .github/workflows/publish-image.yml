@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: build
         run: |
           docker build . -t lordewan/boards:latest
@@ -19,3 +20,10 @@ jobs:
           docker login -u lordewan -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker push lordewan/boards:latest
         working-directory: ./boards
+#      - name: deploy app
+#        env:
+#            FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+#            MONGOURI: ${{ secrets.MONGOURI }}
+#            RABBITMQ: ${{ secrets.RABBITMQ }}
+#        run: flyctl deploy --remote-only
+#        working-directory: ./boards
