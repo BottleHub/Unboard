@@ -25,7 +25,7 @@ type User struct {
 	Password string `json:"password"`
 }
 
-func ConnectDB() *DB {
+func ConnectDB() (*DB, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -45,7 +45,7 @@ func ConnectDB() *DB {
 	}
 
 	fmt.Println("Connected to MongoDB!")
-	return &DB{client: client}
+	return &DB{client: client}, err
 }
 
 func colHelper(db *DB, collectionName string) *mongo.Collection {
