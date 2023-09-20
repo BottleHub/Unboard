@@ -29,14 +29,6 @@ type Fetch struct {
 	ID string `json:"id"`
 }
 
-type FetchChatboards struct {
-	UserID string `json:"userId"`
-}
-
-type FetchMessages struct {
-	ChatboardID string `json:"chatboardId"`
-}
-
 type Message struct {
 	ID        string     `json:"id"`
 	Text      *string    `json:"text,omitempty"`
