@@ -25,7 +25,7 @@ type User struct {
 	Password string `json:"password"`
 }
 
-func ConnectDB() *DB {
+func ConnectDB() (*DB, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -45,7 +45,7 @@ func ConnectDB() *DB {
 	}
 
 	fmt.Println("Connected to MongoDB!")
-	return &DB{client: client}
+	return &DB{client: client}, err
 }
 
 func colHelper(db *DB, collectionName string) *mongo.Collection {
@@ -72,15 +72,31 @@ func (db *DB) resErrHelper(collectionName string, input any) (*mongo.InsertOneRe
 	return res, err
 }
 
-func (db *DB) multipleFetchHelper(collectionName string) (*mongo.Cursor, context.Context) {
+func (db *DB) multipleFetchHelper(collectionName string, ID string, IDName string) (*mongo.Cursor, context.Context) {
 	collection, ctx := db.ctxDeferHelper(collectionName)
 
-	res, err := collection.Find(ctx, bson.M{})
+	objId, _ := primitive.ObjectIDFromHex(ID)
+
+	res, err := collection.Find(ctx, bson.M{IDName: objId})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return res, ctx
+}
+
+func (db *DB) deleteHelper(collectionName string, ID string) error {
+	collection, ctx := db.ctxDeferHelper("messages")
+
+	objId, _ := primitive.ObjectIDFromHex(ID)
+	filter := bson.M{"_id": objId}
+
+	_, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	return err
 }
 
 func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, error) {
@@ -103,24 +119,8 @@ func (db *DB) CreateMessage(input *model.NewMessage) (*model.Message, error) {
 	return message, err
 }
 
-func (db *DB) GetChatboards() ([]*model.Chatboard, error) {
-	res, ctx := db.multipleFetchHelper("chatboards")
-	var (
-		chatboards []*model.Chatboard
-		err        error
-	)
-
-	defer res.Close(ctx)
-
-	if err = res.All(context.TODO(), &chatboards); err != nil {
-		panic(err)
-	}
-
-	return chatboards, err
-}
-
-func (db *DB) GetMessages() ([]*model.Message, error) {
-	res, ctx := db.multipleFetchHelper("messages")
+func (db *DB) GetMessages(ID string) ([]*model.Message, error) {
+	res, ctx := db.multipleFetchHelper("messages", ID, "userId")
 	var (
 		messages []*model.Message
 		err      error
@@ -146,13 +146,16 @@ func (db *DB) SingleChatboard(ID string) (*model.Chatboard, error) {
 	return chatboard, err
 }
 
-func (db *DB) SingleMessage(ID string) (*model.Message, error) {
-	collection, ctx := db.ctxDeferHelper("messages")
-	var message *model.Message
+func (db *DB) DeleteMessage(ID string) (*model.DeleteMessage, error) {
+	err := db.deleteHelper("messages", ID)
+	var delete *model.DeleteMessage
 
-	objId, _ := primitive.ObjectIDFromHex(ID)
+	return delete, err
+}
 
-	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&message)
+func (db *DB) DeleteChatboard(ID string) (*model.DeleteChatboard, error) {
+	err := db.deleteHelper("messages", ID)
+	var delete *model.DeleteChatboard
 
-	return message, err
+	return delete, err
 }

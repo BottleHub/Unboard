@@ -80,10 +80,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Chatboard  func(childComplexity int, input model.FetchChatboard) int
-		Chatboards func(childComplexity int) int
-		Message    func(childComplexity int, input model.FetchMessage) int
-		Messages   func(childComplexity int) int
+		Chatboard func(childComplexity int, input model.Fetch) int
+		Messages  func(childComplexity int, input model.Fetch) int
 	}
 
 	User struct {
@@ -106,10 +104,8 @@ type MutationResolver interface {
 	DeleteMessage(ctx context.Context, id string) (*model.DeleteMessage, error)
 }
 type QueryResolver interface {
-	Chatboards(ctx context.Context) ([]*model.Chatboard, error)
-	Messages(ctx context.Context) ([]*model.Message, error)
-	Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error)
-	Message(ctx context.Context, input model.FetchMessage) (*model.Message, error)
+	Messages(ctx context.Context, input model.Fetch) ([]*model.Message, error)
+	Chatboard(ctx context.Context, input model.Fetch) (*model.Chatboard, error)
 }
 
 type executableSchema struct {
@@ -300,33 +296,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Chatboard(childComplexity, args["input"].(model.FetchChatboard)), true
-
-	case "Query.chatboards":
-		if e.complexity.Query.Chatboards == nil {
-			break
-		}
-
-		return e.complexity.Query.Chatboards(childComplexity), true
-
-	case "Query.message":
-		if e.complexity.Query.Message == nil {
-			break
-		}
-
-		args, err := ec.field_Query_message_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Message(childComplexity, args["input"].(model.FetchMessage)), true
+		return e.complexity.Query.Chatboard(childComplexity, args["input"].(model.Fetch)), true
 
 	case "Query.messages":
 		if e.complexity.Query.Messages == nil {
 			break
 		}
 
-		return e.complexity.Query.Messages(childComplexity), true
+		args, err := ec.field_Query_messages_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Messages(childComplexity, args["input"].(model.Fetch)), true
 
 	case "User.about":
 		if e.complexity.User.About == nil {
@@ -385,8 +367,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputFetchChatboard,
-		ec.unmarshalInputFetchMessage,
+		ec.unmarshalInputFetch,
 		ec.unmarshalInputNewChatboard,
 		ec.unmarshalInputNewMessage,
 		ec.unmarshalInputUpdateChatboard,
@@ -633,10 +614,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_chatboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.FetchChatboard
+	var arg0 model.Fetch
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchChatboard(ctx, tmp)
+		arg0, err = ec.unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -645,13 +626,13 @@ func (ec *executionContext) field_Query_chatboard_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_message_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_messages_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.FetchMessage
+	var arg0 model.Fetch
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchMessage(ctx, tmp)
+		arg0, err = ec.unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1703,64 +1684,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteMessage(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_chatboards(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_chatboards(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Chatboards(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Chatboard)
-	fc.Result = res
-	return ec.marshalNChatboard2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboardᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_chatboards(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
-			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_messages(ctx, field)
 	if err != nil {
@@ -1775,7 +1698,7 @@ func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Messages(rctx)
+		return ec.resolvers.Query().Messages(rctx, fc.Args["input"].(model.Fetch))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1814,6 +1737,17 @@ func (ec *executionContext) fieldContext_Query_messages(ctx context.Context, fie
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_messages_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
 	return fc, nil
 }
 
@@ -1831,7 +1765,7 @@ func (ec *executionContext) _Query_chatboard(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Chatboard(rctx, fc.Args["input"].(model.FetchChatboard))
+		return ec.resolvers.Query().Chatboard(rctx, fc.Args["input"].(model.Fetch))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1880,73 +1814,6 @@ func (ec *executionContext) fieldContext_Query_chatboard(ctx context.Context, fi
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_chatboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_message(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_message(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Message(rctx, fc.Args["input"].(model.FetchMessage))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Message)
-	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
-			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_message_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4186,37 +4053,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputFetchChatboard(ctx context.Context, obj interface{}) (model.FetchChatboard, error) {
-	var it model.FetchChatboard
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputFetchMessage(ctx context.Context, obj interface{}) (model.FetchMessage, error) {
-	var it model.FetchMessage
+func (ec *executionContext) unmarshalInputFetch(ctx context.Context, obj interface{}) (model.Fetch, error) {
+	var it model.Fetch
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -4729,28 +4567,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "chatboards":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_chatboards(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "messages":
 			field := field
 
@@ -4783,28 +4599,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_chatboard(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "message":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_message(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -5253,50 +5047,6 @@ func (ec *executionContext) marshalNChatboard2githubᚗcomᚋbottlehubᚋunboard
 	return ec._Chatboard(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNChatboard2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboardᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Chatboard) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx context.Context, sel ast.SelectionSet, v *model.Chatboard) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5335,13 +5085,8 @@ func (ec *executionContext) marshalNDeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋ
 	return ec._DeleteMessage(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFetchChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchChatboard(ctx context.Context, v interface{}) (model.FetchChatboard, error) {
-	res, err := ec.unmarshalInputFetchChatboard(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNFetchMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchMessage(ctx context.Context, v interface{}) (model.FetchMessage, error) {
-	res, err := ec.unmarshalInputFetchMessage(ctx, v)
+func (ec *executionContext) unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx context.Context, v interface{}) (model.Fetch, error) {
+	res, err := ec.unmarshalInputFetch(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

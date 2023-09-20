@@ -25,11 +25,7 @@ type DeleteMessage struct {
 	ID string `json:"id"`
 }
 
-type FetchChatboard struct {
-	ID string `json:"id"`
-}
-
-type FetchMessage struct {
+type Fetch struct {
 	ID string `json:"id"`
 }
 
