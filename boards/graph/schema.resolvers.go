@@ -12,10 +12,6 @@ import (
 	"github.com/bottlehub/unboard/boards/internals/database"
 )
 
-var (
-	db, _ = database.ConnectDB()
-)
-
 // CreateChatboard is the resolver for the createChatboard field.
 func (r *mutationResolver) CreateChatboard(ctx context.Context, input model.NewChatboard) (*model.Chatboard, error) {
 	chatboard, err := db.CreateChatboard(&input)
@@ -48,25 +44,25 @@ func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (*model
 }
 
 // Chatboards is the resolver for the chatboards field.
-func (r *queryResolver) Chatboards(ctx context.Context) ([]*model.Chatboard, error) {
+func (r *queryResolver) Chatboards(ctx context.Context, input model.FetchChatboards) ([]*model.Chatboard, error) {
 	chatboards, err := db.GetChatboards()
 	return chatboards, err
 }
 
 // Messages is the resolver for the messages field.
-func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
+func (r *queryResolver) Messages(ctx context.Context, input model.FetchMessages) ([]*model.Message, error) {
 	messages, err := db.GetMessages()
 	return messages, err
 }
 
 // Chatboard is the resolver for the chatboard field.
-func (r *queryResolver) Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error) {
+func (r *queryResolver) Chatboard(ctx context.Context, input model.Fetch) (*model.Chatboard, error) {
 	chatboard, err := db.SingleChatboard(input.ID)
 	return chatboard, err
 }
 
 // Message is the resolver for the message field.
-func (r *queryResolver) Message(ctx context.Context, input model.FetchMessage) (*model.Message, error) {
+func (r *queryResolver) Message(ctx context.Context, input model.Fetch) (*model.Message, error) {
 	panic(fmt.Errorf("not implemented: Message - message"))
 }
 
@@ -78,3 +74,7 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+var (
+	db, _ = database.ConnectDB()
+)
