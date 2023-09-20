@@ -17,7 +17,7 @@ jobs:
         working-directory: ./boards
       - name: Publish
         run: |
-          docker login -u lordewan -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker login -u lordewan -p ${{ secrets.MONGOURI }}
           docker push lordewan/boards:latest
         working-directory: ./boards
 #      - name: deploy app
