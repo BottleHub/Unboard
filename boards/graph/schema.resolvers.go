@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bottlehub/unboard/boards/graph/model"
 	"github.com/bottlehub/unboard/boards/internals/database"
@@ -26,12 +25,14 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMes
 
 // UpdateChatboard is the resolver for the updateChatboard field.
 func (r *mutationResolver) UpdateChatboard(ctx context.Context, id string, input model.UpdateChatboard) (*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: UpdateChatboard - updateChatboard"))
+	chatboard, err := db.UpdateChatboard(id, &input)
+	return chatboard, err
 }
 
 // UpdateMessage is the resolver for the updateMessage field.
 func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: UpdateMessage - updateMessage"))
+	message, err := db.UpdateMessage(id, &input)
+	return message, err
 }
 
 // DeleteChatboard is the resolver for the deleteChatboard field.

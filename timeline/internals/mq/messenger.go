@@ -6,7 +6,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func Publish(queue string, message string) (int, error) {
+func Publish(queue string, message string) error {
 	channel := Connect()
 	defer channel.Close()
 
@@ -19,10 +19,7 @@ func Publish(queue string, message string) (int, error) {
 		nil,
 	)
 	if err != nil {
-		ch := make(chan string)
-		go panic(err)
-		<-ch
-		return 1, err
+		panic(err)
 	}
 
 	fmt.Println(q)
@@ -38,12 +35,9 @@ func Publish(queue string, message string) (int, error) {
 		},
 	)
 	if err != nil {
-		ch := make(chan string)
-		go panic(err)
-		<-ch
-		return 2, err
+		panic(err)
 	}
 
 	fmt.Println("Published Message to Queue")
-	return 0, err
+	return err
 }
