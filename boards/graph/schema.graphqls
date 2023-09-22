@@ -47,11 +47,7 @@ enum Status {
 }
 
 # Inputs Fetch
-input FetchChatboard {
-  id: String!
-}
-
-input FetchMessage {
+input Fetch {
   id: String!
 }
 
@@ -88,11 +84,9 @@ input UpdateMessage {
 # Queries and Mutations
 type Query {
   # Multiple Queries
-  chatboards: [Chatboard!]!
-  messages: [Message!]!
+  messages(input: Fetch!): [Message!]!
   # Single Queries
-  chatboard(input: FetchChatboard!): Chatboard!
-  message(input: FetchMessage!): Message!
+  chatboard(input: Fetch!): Chatboard!
 }
 
 type Mutation {

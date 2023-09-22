@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/bottlehub/unboard/boards/graph/model"
 	"github.com/bottlehub/unboard/boards/internals/database"
@@ -20,50 +19,44 @@ func (r *mutationResolver) CreateChatboard(ctx context.Context, input model.NewC
 
 // CreateMessage is the resolver for the createMessage field.
 func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: CreateMessage - createMessage"))
+	message, err := db.CreateMessage(&input)
+	return message, err
 }
 
 // UpdateChatboard is the resolver for the updateChatboard field.
 func (r *mutationResolver) UpdateChatboard(ctx context.Context, id string, input model.UpdateChatboard) (*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: UpdateChatboard - updateChatboard"))
+	chatboard, err := db.UpdateChatboard(id, &input)
+	return chatboard, err
 }
 
 // UpdateMessage is the resolver for the updateMessage field.
 func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: UpdateMessage - updateMessage"))
+	message, err := db.UpdateMessage(id, &input)
+	return message, err
 }
 
 // DeleteChatboard is the resolver for the deleteChatboard field.
 func (r *mutationResolver) DeleteChatboard(ctx context.Context, id string) (*model.DeleteChatboard, error) {
-	panic(fmt.Errorf("not implemented: DeleteChatboard - deleteChatboard"))
+	chatboard, err := db.DeleteChatboard(id)
+	return chatboard, err
 }
 
 // DeleteMessage is the resolver for the deleteMessage field.
 func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (*model.DeleteMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteMessage - deleteMessage"))
-}
-
-// Chatboards is the resolver for the chatboards field.
-func (r *queryResolver) Chatboards(ctx context.Context) ([]*model.Chatboard, error) {
-	chatboards, err := db.GetChatboards()
-	return chatboards, err
+	messages, err := db.DeleteMessage(id)
+	return messages, err
 }
 
 // Messages is the resolver for the messages field.
-func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
-	messages, err := db.GetMessages()
+func (r *queryResolver) Messages(ctx context.Context, input model.Fetch) ([]*model.Message, error) {
+	messages, err := db.GetMessages(input.ID)
 	return messages, err
 }
 
 // Chatboard is the resolver for the chatboard field.
-func (r *queryResolver) Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error) {
+func (r *queryResolver) Chatboard(ctx context.Context, input model.Fetch) (*model.Chatboard, error) {
 	chatboard, err := db.SingleChatboard(input.ID)
 	return chatboard, err
-}
-
-// Message is the resolver for the message field.
-func (r *queryResolver) Message(ctx context.Context, input model.FetchMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: Message - message"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -82,5 +75,5 @@ type queryResolver struct{ *Resolver }
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
 var (
-	db = database.ConnectDB()
+	db, _ = database.ConnectDB()
 )

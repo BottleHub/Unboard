@@ -45,45 +45,30 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Chatboard struct {
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		ImageURL    func(childComplexity int) int
-		Members     func(childComplexity int) int
-		Messages    func(childComplexity int) int
-		Name        func(childComplexity int) int
-	}
-
-	DeleteChatboard struct {
+	DeleteTimeline struct {
 		ID func(childComplexity int) int
-	}
-
-	DeleteMessage struct {
-		ID func(childComplexity int) int
-	}
-
-	Message struct {
-		FileURL   func(childComplexity int) int
-		ID        func(childComplexity int) int
-		MessageBy func(childComplexity int) int
-		MessageOn func(childComplexity int) int
-		Text      func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateChatboard func(childComplexity int, input model.NewChatboard) int
-		CreateMessage   func(childComplexity int, input model.NewMessage) int
-		DeleteChatboard func(childComplexity int, id string) int
-		DeleteMessage   func(childComplexity int, id string) int
-		UpdateChatboard func(childComplexity int, id string, input model.UpdateChatboard) int
-		UpdateMessage   func(childComplexity int, id string, input model.UpdateMessage) int
+		CreateTimeline func(childComplexity int, input model.NewTimeline) int
+		DeleteTimeline func(childComplexity int, id string) int
+		UpdateTimeline func(childComplexity int, id string, input model.UpdateTimeline) int
 	}
 
 	Query struct {
-		Chatboard  func(childComplexity int, input model.FetchChatboard) int
-		Chatboards func(childComplexity int) int
-		Message    func(childComplexity int, input model.FetchMessage) int
-		Messages   func(childComplexity int) int
+		Timeline          func(childComplexity int, input model.Fetch) int
+		TimelinesByParent func(childComplexity int, input model.Fetch) int
+		TimelinesByUser   func(childComplexity int, input model.Fetch) int
+	}
+
+	Timeline struct {
+		ID           func(childComplexity int) int
+		ImageURL     func(childComplexity int) int
+		Likes        func(childComplexity int) int
+		PostedBy     func(childComplexity int) int
+		PostedOn     func(childComplexity int) int
+		SubTimelines func(childComplexity int) int
+		Text         func(childComplexity int) int
 	}
 
 	User struct {
@@ -98,18 +83,14 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateChatboard(ctx context.Context, input model.NewChatboard) (*model.Chatboard, error)
-	CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error)
-	UpdateChatboard(ctx context.Context, id string, input model.UpdateChatboard) (*model.Chatboard, error)
-	UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error)
-	DeleteChatboard(ctx context.Context, id string) (*model.DeleteChatboard, error)
-	DeleteMessage(ctx context.Context, id string) (*model.DeleteMessage, error)
+	CreateTimeline(ctx context.Context, input model.NewTimeline) (*model.Timeline, error)
+	UpdateTimeline(ctx context.Context, id string, input model.UpdateTimeline) (*model.Timeline, error)
+	DeleteTimeline(ctx context.Context, id string) (*model.DeleteTimeline, error)
 }
 type QueryResolver interface {
-	Chatboards(ctx context.Context) ([]*model.Chatboard, error)
-	Messages(ctx context.Context) ([]*model.Message, error)
-	Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error)
-	Message(ctx context.Context, input model.FetchMessage) (*model.Message, error)
+	TimelinesByParent(ctx context.Context, input model.Fetch) ([]*model.Timeline, error)
+	TimelinesByUser(ctx context.Context, input model.Fetch) ([]*model.Timeline, error)
+	Timeline(ctx context.Context, input model.Fetch) (*model.Timeline, error)
 }
 
 type executableSchema struct {
@@ -127,206 +108,133 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Chatboard.description":
-		if e.complexity.Chatboard.Description == nil {
+	case "DeleteTimeline.id":
+		if e.complexity.DeleteTimeline.ID == nil {
 			break
 		}
 
-		return e.complexity.Chatboard.Description(childComplexity), true
+		return e.complexity.DeleteTimeline.ID(childComplexity), true
 
-	case "Chatboard.id":
-		if e.complexity.Chatboard.ID == nil {
+	case "Mutation.createTimeline":
+		if e.complexity.Mutation.CreateTimeline == nil {
 			break
 		}
 
-		return e.complexity.Chatboard.ID(childComplexity), true
-
-	case "Chatboard.imageURL":
-		if e.complexity.Chatboard.ImageURL == nil {
-			break
-		}
-
-		return e.complexity.Chatboard.ImageURL(childComplexity), true
-
-	case "Chatboard.members":
-		if e.complexity.Chatboard.Members == nil {
-			break
-		}
-
-		return e.complexity.Chatboard.Members(childComplexity), true
-
-	case "Chatboard.messages":
-		if e.complexity.Chatboard.Messages == nil {
-			break
-		}
-
-		return e.complexity.Chatboard.Messages(childComplexity), true
-
-	case "Chatboard.name":
-		if e.complexity.Chatboard.Name == nil {
-			break
-		}
-
-		return e.complexity.Chatboard.Name(childComplexity), true
-
-	case "DeleteChatboard.id":
-		if e.complexity.DeleteChatboard.ID == nil {
-			break
-		}
-
-		return e.complexity.DeleteChatboard.ID(childComplexity), true
-
-	case "DeleteMessage.id":
-		if e.complexity.DeleteMessage.ID == nil {
-			break
-		}
-
-		return e.complexity.DeleteMessage.ID(childComplexity), true
-
-	case "Message.fileURL":
-		if e.complexity.Message.FileURL == nil {
-			break
-		}
-
-		return e.complexity.Message.FileURL(childComplexity), true
-
-	case "Message.id":
-		if e.complexity.Message.ID == nil {
-			break
-		}
-
-		return e.complexity.Message.ID(childComplexity), true
-
-	case "Message.messageBy":
-		if e.complexity.Message.MessageBy == nil {
-			break
-		}
-
-		return e.complexity.Message.MessageBy(childComplexity), true
-
-	case "Message.messageOn":
-		if e.complexity.Message.MessageOn == nil {
-			break
-		}
-
-		return e.complexity.Message.MessageOn(childComplexity), true
-
-	case "Message.text":
-		if e.complexity.Message.Text == nil {
-			break
-		}
-
-		return e.complexity.Message.Text(childComplexity), true
-
-	case "Mutation.createChatboard":
-		if e.complexity.Mutation.CreateChatboard == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createChatboard_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createTimeline_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateChatboard(childComplexity, args["input"].(model.NewChatboard)), true
+		return e.complexity.Mutation.CreateTimeline(childComplexity, args["input"].(model.NewTimeline)), true
 
-	case "Mutation.createMessage":
-		if e.complexity.Mutation.CreateMessage == nil {
+	case "Mutation.deleteTimeline":
+		if e.complexity.Mutation.DeleteTimeline == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createMessage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteTimeline_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMessage(childComplexity, args["input"].(model.NewMessage)), true
+		return e.complexity.Mutation.DeleteTimeline(childComplexity, args["id"].(string)), true
 
-	case "Mutation.deleteChatboard":
-		if e.complexity.Mutation.DeleteChatboard == nil {
+	case "Mutation.updateTimeline":
+		if e.complexity.Mutation.UpdateTimeline == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteChatboard_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateTimeline_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteChatboard(childComplexity, args["id"].(string)), true
+		return e.complexity.Mutation.UpdateTimeline(childComplexity, args["id"].(string), args["input"].(model.UpdateTimeline)), true
 
-	case "Mutation.deleteMessage":
-		if e.complexity.Mutation.DeleteMessage == nil {
+	case "Query.timeline":
+		if e.complexity.Query.Timeline == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteMessage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_timeline_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteMessage(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Timeline(childComplexity, args["input"].(model.Fetch)), true
 
-	case "Mutation.updateChatboard":
-		if e.complexity.Mutation.UpdateChatboard == nil {
+	case "Query.timelinesByParent":
+		if e.complexity.Query.TimelinesByParent == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateChatboard_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_timelinesByParent_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateChatboard(childComplexity, args["id"].(string), args["input"].(model.UpdateChatboard)), true
+		return e.complexity.Query.TimelinesByParent(childComplexity, args["input"].(model.Fetch)), true
 
-	case "Mutation.updateMessage":
-		if e.complexity.Mutation.UpdateMessage == nil {
+	case "Query.timelinesByUser":
+		if e.complexity.Query.TimelinesByUser == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateMessage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_timelinesByUser_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateMessage(childComplexity, args["id"].(string), args["input"].(model.UpdateMessage)), true
+		return e.complexity.Query.TimelinesByUser(childComplexity, args["input"].(model.Fetch)), true
 
-	case "Query.chatboard":
-		if e.complexity.Query.Chatboard == nil {
+	case "Timeline.id":
+		if e.complexity.Timeline.ID == nil {
 			break
 		}
 
-		args, err := ec.field_Query_chatboard_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
+		return e.complexity.Timeline.ID(childComplexity), true
 
-		return e.complexity.Query.Chatboard(childComplexity, args["input"].(model.FetchChatboard)), true
-
-	case "Query.chatboards":
-		if e.complexity.Query.Chatboards == nil {
+	case "Timeline.imageURL":
+		if e.complexity.Timeline.ImageURL == nil {
 			break
 		}
 
-		return e.complexity.Query.Chatboards(childComplexity), true
+		return e.complexity.Timeline.ImageURL(childComplexity), true
 
-	case "Query.message":
-		if e.complexity.Query.Message == nil {
+	case "Timeline.likes":
+		if e.complexity.Timeline.Likes == nil {
 			break
 		}
 
-		args, err := ec.field_Query_message_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
+		return e.complexity.Timeline.Likes(childComplexity), true
 
-		return e.complexity.Query.Message(childComplexity, args["input"].(model.FetchMessage)), true
-
-	case "Query.messages":
-		if e.complexity.Query.Messages == nil {
+	case "Timeline.postedBy":
+		if e.complexity.Timeline.PostedBy == nil {
 			break
 		}
 
-		return e.complexity.Query.Messages(childComplexity), true
+		return e.complexity.Timeline.PostedBy(childComplexity), true
+
+	case "Timeline.postedOn":
+		if e.complexity.Timeline.PostedOn == nil {
+			break
+		}
+
+		return e.complexity.Timeline.PostedOn(childComplexity), true
+
+	case "Timeline.subTimelines":
+		if e.complexity.Timeline.SubTimelines == nil {
+			break
+		}
+
+		return e.complexity.Timeline.SubTimelines(childComplexity), true
+
+	case "Timeline.text":
+		if e.complexity.Timeline.Text == nil {
+			break
+		}
+
+		return e.complexity.Timeline.Text(childComplexity), true
 
 	case "User.about":
 		if e.complexity.User.About == nil {
@@ -385,12 +293,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputFetchChatboard,
-		ec.unmarshalInputFetchMessage,
-		ec.unmarshalInputNewChatboard,
-		ec.unmarshalInputNewMessage,
-		ec.unmarshalInputUpdateChatboard,
-		ec.unmarshalInputUpdateMessage,
+		ec.unmarshalInputFetch,
+		ec.unmarshalInputNewTimeline,
+		ec.unmarshalInputUpdateTimeline,
 	)
 	first := true
 
@@ -507,13 +412,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createChatboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createTimeline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewChatboard
+	var arg0 model.NewTimeline
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewChatboard(ctx, tmp)
+		arg0, err = ec.unmarshalNNewTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewTimeline(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -522,91 +427,37 @@ func (ec *executionContext) field_Mutation_createChatboard_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteTimeline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewMessage
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTimeline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateTimeline
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewMessage(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteChatboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateChatboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 model.UpdateChatboard
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateChatboard(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateMessage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 model.UpdateMessage
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNUpdateMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateMessage(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateTimeline(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -630,13 +481,13 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_chatboard_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_timeline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.FetchChatboard
+	var arg0 model.Fetch
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchChatboard(ctx, tmp)
+		arg0, err = ec.unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -645,13 +496,28 @@ func (ec *executionContext) field_Query_chatboard_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_message_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_timelinesByParent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.FetchMessage
+	var arg0 model.Fetch
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchMessage(ctx, tmp)
+		arg0, err = ec.unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_timelinesByUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Fetch
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -698,291 +564,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Chatboard_id(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chatboard_name(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chatboard_imageURL(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_imageURL(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ImageURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_imageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chatboard_description(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chatboard_members(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_members(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Members, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.User)
-	fc.Result = res
-	return ec.marshalOUser2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_members(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "about":
-				return ec.fieldContext_User_about(ctx, field)
-			case "avatarImageURL":
-				return ec.fieldContext_User_avatarImageURL(ctx, field)
-			case "following":
-				return ec.fieldContext_User_following(ctx, field)
-			case "followers":
-				return ec.fieldContext_User_followers(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chatboard_messages(ctx context.Context, field graphql.CollectedField, obj *model.Chatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chatboard_messages(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Messages, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Message)
-	fc.Result = res
-	return ec.marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chatboard_messages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chatboard",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
-			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _DeleteChatboard_id(ctx context.Context, field graphql.CollectedField, obj *model.DeleteChatboard) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteChatboard_id(ctx, field)
+func (ec *executionContext) _DeleteTimeline_id(ctx context.Context, field graphql.CollectedField, obj *model.DeleteTimeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteTimeline_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1012,9 +595,9 @@ func (ec *executionContext) _DeleteChatboard_id(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteChatboard_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DeleteTimeline_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "DeleteChatboard",
+		Object:     "DeleteTimeline",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1025,8 +608,8 @@ func (ec *executionContext) fieldContext_DeleteChatboard_id(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _DeleteMessage_id(ctx context.Context, field graphql.CollectedField, obj *model.DeleteMessage) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteMessage_id(ctx, field)
+func (ec *executionContext) _Mutation_createTimeline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTimeline(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1039,7 +622,7 @@ func (ec *executionContext) _DeleteMessage_id(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Mutation().CreateTimeline(rctx, fc.Args["input"].(model.NewTimeline))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1051,300 +634,12 @@ func (ec *executionContext) _DeleteMessage_id(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Timeline)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteMessage_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "DeleteMessage",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_id(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_text(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_text(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_text(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_fileURL(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_fileURL(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FileURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_fileURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_messageBy(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_messageBy(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MessageBy, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_messageBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "about":
-				return ec.fieldContext_User_about(ctx, field)
-			case "avatarImageURL":
-				return ec.fieldContext_User_avatarImageURL(ctx, field)
-			case "following":
-				return ec.fieldContext_User_following(ctx, field)
-			case "followers":
-				return ec.fieldContext_User_followers(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Message_messageOn(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Message_messageOn(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MessageOn, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Chatboard)
-	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Message_messageOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Message",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
-			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createChatboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createChatboard(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateChatboard(rctx, fc.Args["input"].(model.NewChatboard))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Chatboard)
-	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createTimeline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1353,86 +648,21 @@ func (ec *executionContext) fieldContext_Mutation_createChatboard(ctx context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
 			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createChatboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createMessage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateMessage(rctx, fc.Args["input"].(model.NewMessage))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Message)
-	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
 			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
 		},
 	}
 	defer func() {
@@ -1442,15 +672,15 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createMessage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createTimeline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateChatboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateChatboard(ctx, field)
+func (ec *executionContext) _Mutation_updateTimeline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTimeline(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1463,7 +693,7 @@ func (ec *executionContext) _Mutation_updateChatboard(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateChatboard(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateChatboard))
+		return ec.resolvers.Mutation().UpdateTimeline(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateTimeline))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1475,12 +705,12 @@ func (ec *executionContext) _Mutation_updateChatboard(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Chatboard)
+	res := resTmp.(*model.Timeline)
 	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
+	return ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_updateChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateTimeline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1489,86 +719,21 @@ func (ec *executionContext) fieldContext_Mutation_updateChatboard(ctx context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
 			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateChatboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateMessage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateMessage(rctx, fc.Args["id"].(string), fc.Args["input"].(model.UpdateMessage))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Message)
-	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
 			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
 		},
 	}
 	defer func() {
@@ -1578,15 +743,15 @@ func (ec *executionContext) fieldContext_Mutation_updateMessage(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateMessage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateTimeline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteChatboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteChatboard(ctx, field)
+func (ec *executionContext) _Mutation_deleteTimeline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteTimeline(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1599,7 +764,7 @@ func (ec *executionContext) _Mutation_deleteChatboard(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteChatboard(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Mutation().DeleteTimeline(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1611,12 +776,12 @@ func (ec *executionContext) _Mutation_deleteChatboard(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteChatboard)
+	res := resTmp.(*model.DeleteTimeline)
 	fc.Result = res
-	return ec.marshalNDeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx, field.Selections, res)
+	return ec.marshalNDeleteTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteTimeline(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteTimeline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1625,9 +790,9 @@ func (ec *executionContext) fieldContext_Mutation_deleteChatboard(ctx context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_DeleteChatboard_id(ctx, field)
+				return ec.fieldContext_DeleteTimeline_id(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteChatboard", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type DeleteTimeline", field.Name)
 		},
 	}
 	defer func() {
@@ -1637,15 +802,15 @@ func (ec *executionContext) fieldContext_Mutation_deleteChatboard(ctx context.Co
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteChatboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteTimeline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteMessage(ctx, field)
+func (ec *executionContext) _Query_timelinesByParent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_timelinesByParent(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1658,7 +823,7 @@ func (ec *executionContext) _Mutation_deleteMessage(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteMessage(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Query().TimelinesByParent(rctx, fc.Args["input"].(model.Fetch))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1670,71 +835,12 @@ func (ec *executionContext) _Mutation_deleteMessage(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteMessage)
+	res := resTmp.([]*model.Timeline)
 	fc.Result = res
-	return ec.marshalNDeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx, field.Selections, res)
+	return ec.marshalNTimeline2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimelineᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_DeleteMessage_id(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DeleteMessage", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteMessage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_chatboards(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_chatboards(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Chatboards(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Chatboard)
-	fc.Result = res
-	return ec.marshalNChatboard2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboardᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_chatboards(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_timelinesByParent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1743,133 +849,21 @@ func (ec *executionContext) fieldContext_Query_chatboards(ctx context.Context, f
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
 			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_messages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_messages(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Messages(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Message)
-	fc.Result = res
-	return ec.marshalNMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_messages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
 			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_chatboard(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_chatboard(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Chatboard(rctx, fc.Args["input"].(model.FetchChatboard))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Chatboard)
-	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_chatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Chatboard_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Chatboard_name(ctx, field)
-			case "imageURL":
-				return ec.fieldContext_Chatboard_imageURL(ctx, field)
-			case "description":
-				return ec.fieldContext_Chatboard_description(ctx, field)
-			case "members":
-				return ec.fieldContext_Chatboard_members(ctx, field)
-			case "messages":
-				return ec.fieldContext_Chatboard_messages(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Chatboard", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
 		},
 	}
 	defer func() {
@@ -1879,15 +873,15 @@ func (ec *executionContext) fieldContext_Query_chatboard(ctx context.Context, fi
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_chatboard_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_timelinesByParent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_message(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_message(ctx, field)
+func (ec *executionContext) _Query_timelinesByUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_timelinesByUser(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1900,7 +894,7 @@ func (ec *executionContext) _Query_message(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Message(rctx, fc.Args["input"].(model.FetchMessage))
+		return ec.resolvers.Query().TimelinesByUser(rctx, fc.Args["input"].(model.Fetch))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1912,12 +906,12 @@ func (ec *executionContext) _Query_message(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Message)
+	res := resTmp.([]*model.Timeline)
 	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalNTimeline2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimelineᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_timelinesByUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1926,17 +920,21 @@ func (ec *executionContext) fieldContext_Query_message(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
 			case "text":
-				return ec.fieldContext_Message_text(ctx, field)
-			case "fileURL":
-				return ec.fieldContext_Message_fileURL(ctx, field)
-			case "messageBy":
-				return ec.fieldContext_Message_messageBy(ctx, field)
-			case "messageOn":
-				return ec.fieldContext_Message_messageOn(ctx, field)
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
 		},
 	}
 	defer func() {
@@ -1946,7 +944,78 @@ func (ec *executionContext) fieldContext_Query_message(ctx context.Context, fiel
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_message_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_timelinesByUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_timeline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_timeline(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Timeline(rctx, fc.Args["input"].(model.Fetch))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Timeline)
+	fc.Result = res
+	return ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_timeline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
+			case "text":
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_timeline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2077,6 +1146,353 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_id(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_postedBy(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_postedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PostedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_postedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "about":
+				return ec.fieldContext_User_about(ctx, field)
+			case "avatarImageURL":
+				return ec.fieldContext_User_avatarImageURL(ctx, field)
+			case "following":
+				return ec.fieldContext_User_following(ctx, field)
+			case "followers":
+				return ec.fieldContext_User_followers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_postedOn(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_postedOn(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PostedOn, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Timeline)
+	fc.Result = res
+	return ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_postedOn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
+			case "text":
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_imageURL(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_imageURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_imageURL(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_text(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_text(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Text, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_text(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_likes(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_likes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Likes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_likes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Timeline_subTimelines(ctx context.Context, field graphql.CollectedField, obj *model.Timeline) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Timeline_subTimelines(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubTimelines, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Timeline)
+	fc.Result = res
+	return ec.marshalOTimeline2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimelineᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Timeline_subTimelines(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Timeline",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Timeline_id(ctx, field)
+			case "postedBy":
+				return ec.fieldContext_Timeline_postedBy(ctx, field)
+			case "postedOn":
+				return ec.fieldContext_Timeline_postedOn(ctx, field)
+			case "imageURL":
+				return ec.fieldContext_Timeline_imageURL(ctx, field)
+			case "text":
+				return ec.fieldContext_Timeline_text(ctx, field)
+			case "likes":
+				return ec.fieldContext_Timeline_likes(ctx, field)
+			case "subTimelines":
+				return ec.fieldContext_Timeline_subTimelines(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Timeline", field.Name)
 		},
 	}
 	return fc, nil
@@ -4186,8 +3602,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputFetchChatboard(ctx context.Context, obj interface{}) (model.FetchChatboard, error) {
-	var it model.FetchChatboard
+func (ec *executionContext) unmarshalInputFetch(ctx context.Context, obj interface{}) (model.Fetch, error) {
+	var it model.Fetch
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -4215,96 +3631,47 @@ func (ec *executionContext) unmarshalInputFetchChatboard(ctx context.Context, ob
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputFetchMessage(ctx context.Context, obj interface{}) (model.FetchMessage, error) {
-	var it model.FetchMessage
+func (ec *executionContext) unmarshalInputNewTimeline(ctx context.Context, obj interface{}) (model.NewTimeline, error) {
+	var it model.NewTimeline
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id"}
+	fieldsInOrder := [...]string{"postedBy", "postedOn", "imageURL", "text", "like"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "id":
+		case "postedBy":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("postedBy"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNewChatboard(ctx context.Context, obj interface{}) (model.NewChatboard, error) {
-	var it model.NewChatboard
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name", "imageURL", "description"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
+			it.PostedBy = data
+		case "postedOn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("postedOn"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Name = data
+			it.PostedOn = data
 		case "imageURL":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imageURL"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ImageURL = data
-		case "description":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Description = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNewMessage(ctx context.Context, obj interface{}) (model.NewMessage, error) {
-	var it model.NewMessage
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"text", "fileURL", "messageBy", "messageOn"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
+			it.ImageURL = data
 		case "text":
 			var err error
 
@@ -4314,47 +3681,29 @@ func (ec *executionContext) unmarshalInputNewMessage(ctx context.Context, obj in
 				return it, err
 			}
 			it.Text = data
-		case "fileURL":
+		case "like":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileURL"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("like"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.FileURL = data
-		case "messageBy":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageBy"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.MessageBy = data
-		case "messageOn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageOn"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.MessageOn = data
+			it.Like = data
 		}
 	}
 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateChatboard(ctx context.Context, obj interface{}) (model.UpdateChatboard, error) {
-	var it model.UpdateChatboard
+func (ec *executionContext) unmarshalInputUpdateTimeline(ctx context.Context, obj interface{}) (model.UpdateTimeline, error) {
+	var it model.UpdateTimeline
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "imageURL", "description"}
+	fieldsInOrder := [...]string{"name", "imageURL", "text", "subTimeline"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4379,35 +3728,6 @@ func (ec *executionContext) unmarshalInputUpdateChatboard(ctx context.Context, o
 				return it, err
 			}
 			it.ImageURL = data
-		case "description":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Description = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateMessage(ctx context.Context, obj interface{}) (model.UpdateMessage, error) {
-	var it model.UpdateMessage
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"text", "fileURL"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
 		case "text":
 			var err error
 
@@ -4417,15 +3737,15 @@ func (ec *executionContext) unmarshalInputUpdateMessage(ctx context.Context, obj
 				return it, err
 			}
 			it.Text = data
-		case "fileURL":
+		case "subTimeline":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileURL"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subTimeline"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.FileURL = data
+			it.SubTimeline = data
 		}
 	}
 
@@ -4440,166 +3760,19 @@ func (ec *executionContext) unmarshalInputUpdateMessage(ctx context.Context, obj
 
 // region    **************************** object.gotpl ****************************
 
-var chatboardImplementors = []string{"Chatboard"}
+var deleteTimelineImplementors = []string{"DeleteTimeline"}
 
-func (ec *executionContext) _Chatboard(ctx context.Context, sel ast.SelectionSet, obj *model.Chatboard) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, chatboardImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Chatboard")
-		case "id":
-			out.Values[i] = ec._Chatboard_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "name":
-			out.Values[i] = ec._Chatboard_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "imageURL":
-			out.Values[i] = ec._Chatboard_imageURL(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "description":
-			out.Values[i] = ec._Chatboard_description(ctx, field, obj)
-		case "members":
-			out.Values[i] = ec._Chatboard_members(ctx, field, obj)
-		case "messages":
-			out.Values[i] = ec._Chatboard_messages(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var deleteChatboardImplementors = []string{"DeleteChatboard"}
-
-func (ec *executionContext) _DeleteChatboard(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteChatboard) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteChatboardImplementors)
+func (ec *executionContext) _DeleteTimeline(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteTimeline) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteTimelineImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteChatboard")
+			out.Values[i] = graphql.MarshalString("DeleteTimeline")
 		case "id":
-			out.Values[i] = ec._DeleteChatboard_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var deleteMessageImplementors = []string{"DeleteMessage"}
-
-func (ec *executionContext) _DeleteMessage(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteMessage) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, deleteMessageImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("DeleteMessage")
-		case "id":
-			out.Values[i] = ec._DeleteMessage_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var messageImplementors = []string{"Message"}
-
-func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, obj *model.Message) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, messageImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Message")
-		case "id":
-			out.Values[i] = ec._Message_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "text":
-			out.Values[i] = ec._Message_text(ctx, field, obj)
-		case "fileURL":
-			out.Values[i] = ec._Message_fileURL(ctx, field, obj)
-		case "messageBy":
-			out.Values[i] = ec._Message_messageBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "messageOn":
-			out.Values[i] = ec._Message_messageOn(ctx, field, obj)
+			out.Values[i] = ec._DeleteTimeline_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -4645,44 +3818,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createChatboard":
+		case "createTimeline":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createChatboard(ctx, field)
+				return ec._Mutation_createTimeline(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createMessage":
+		case "updateTimeline":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createMessage(ctx, field)
+				return ec._Mutation_updateTimeline(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateChatboard":
+		case "deleteTimeline":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateChatboard(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateMessage":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateMessage(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteChatboard":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteChatboard(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteMessage":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteMessage(ctx, field)
+				return ec._Mutation_deleteTimeline(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4729,7 +3881,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "chatboards":
+		case "timelinesByParent":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -4738,7 +3890,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_chatboards(ctx, field)
+				res = ec._Query_timelinesByParent(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4751,7 +3903,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "messages":
+		case "timelinesByUser":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -4760,7 +3912,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_messages(ctx, field)
+				res = ec._Query_timelinesByUser(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4773,7 +3925,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "chatboard":
+		case "timeline":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -4782,29 +3934,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_chatboard(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "message":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_message(ctx, field)
+				res = ec._Query_timeline(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4825,6 +3955,66 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var timelineImplementors = []string{"Timeline"}
+
+func (ec *executionContext) _Timeline(ctx context.Context, sel ast.SelectionSet, obj *model.Timeline) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, timelineImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Timeline")
+		case "id":
+			out.Values[i] = ec._Timeline_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "postedBy":
+			out.Values[i] = ec._Timeline_postedBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "postedOn":
+			out.Values[i] = ec._Timeline_postedOn(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "imageURL":
+			out.Values[i] = ec._Timeline_imageURL(ctx, field, obj)
+		case "text":
+			out.Values[i] = ec._Timeline_text(ctx, field, obj)
+		case "likes":
+			out.Values[i] = ec._Timeline_likes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "subTimelines":
+			out.Values[i] = ec._Timeline_subTimelines(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5249,99 +4439,22 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx context.Context, sel ast.SelectionSet, v model.Chatboard) graphql.Marshaler {
-	return ec._Chatboard(ctx, sel, &v)
+func (ec *executionContext) marshalNDeleteTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteTimeline(ctx context.Context, sel ast.SelectionSet, v model.DeleteTimeline) graphql.Marshaler {
+	return ec._DeleteTimeline(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNChatboard2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboardᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Chatboard) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx context.Context, sel ast.SelectionSet, v *model.Chatboard) graphql.Marshaler {
+func (ec *executionContext) marshalNDeleteTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteTimeline(ctx context.Context, sel ast.SelectionSet, v *model.DeleteTimeline) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Chatboard(ctx, sel, v)
+	return ec._DeleteTimeline(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx context.Context, sel ast.SelectionSet, v model.DeleteChatboard) graphql.Marshaler {
-	return ec._DeleteChatboard(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx context.Context, sel ast.SelectionSet, v *model.DeleteChatboard) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteChatboard(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDeleteMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx context.Context, sel ast.SelectionSet, v model.DeleteMessage) graphql.Marshaler {
-	return ec._DeleteMessage(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx context.Context, sel ast.SelectionSet, v *model.DeleteMessage) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteMessage(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNFetchChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchChatboard(ctx context.Context, v interface{}) (model.FetchChatboard, error) {
-	res, err := ec.unmarshalInputFetchChatboard(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNFetchMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetchMessage(ctx context.Context, v interface{}) (model.FetchMessage, error) {
-	res, err := ec.unmarshalInputFetchMessage(ctx, v)
+func (ec *executionContext) unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx context.Context, v interface{}) (model.Fetch, error) {
+	res, err := ec.unmarshalInputFetch(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5360,11 +4473,46 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v model.Message) graphql.Marshaler {
-	return ec._Message(ctx, sel, &v)
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNNewTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewTimeline(ctx context.Context, v interface{}) (model.NewTimeline, error) {
+	res, err := ec.unmarshalInputNewTimeline(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx context.Context, sel ast.SelectionSet, v model.Timeline) graphql.Marshaler {
+	return ec._Timeline(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTimeline2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimelineᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Timeline) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5388,7 +4536,7 @@ func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunb
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, sel, v[i])
+			ret[i] = ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5408,48 +4556,18 @@ func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunb
 	return ret
 }
 
-func (ec *executionContext) marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx context.Context, sel ast.SelectionSet, v *model.Timeline) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Message(ctx, sel, v)
+	return ec._Timeline(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNewChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewChatboard(ctx context.Context, v interface{}) (model.NewChatboard, error) {
-	res, err := ec.unmarshalInputNewChatboard(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐNewMessage(ctx context.Context, v interface{}) (model.NewMessage, error) {
-	res, err := ec.unmarshalInputNewMessage(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNUpdateChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateChatboard(ctx context.Context, v interface{}) (model.UpdateChatboard, error) {
-	res, err := ec.unmarshalInputUpdateChatboard(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNUpdateMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateMessage(ctx context.Context, v interface{}) (model.UpdateMessage, error) {
-	res, err := ec.unmarshalInputUpdateMessage(ctx, v)
+func (ec *executionContext) unmarshalNUpdateTimeline2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUpdateTimeline(ctx context.Context, v interface{}) (model.UpdateTimeline, error) {
+	res, err := ec.unmarshalInputUpdateTimeline(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5742,7 +4860,23 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
+func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) marshalOTimeline2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimelineᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Timeline) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -5769,7 +4903,7 @@ func (ec *executionContext) marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunb
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, sel, v[i])
+			ret[i] = ec.marshalNTimeline2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐTimeline(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5787,22 +4921,6 @@ func (ec *executionContext) marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunb
 	}
 
 	return ret
-}
-
-func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(*v)
-	return res
 }
 
 func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
@@ -5842,53 +4960,6 @@ func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋbottlehubᚋunboar
 
 	}
 	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
 
 	return ret
 }

@@ -13,29 +13,18 @@ type User {
   # @hasInverse(field: following)
 }
 
-type Chatboard {
+type Timeline {
   id: ID!
-  name: String!
-  imageURL: String!
-  description: String
-  members: [User!]
-  messages: [Message!]
+  postedBy: User!
+  postedOn: Timeline!
+  imageURL: String
+  text: String
+  likes: Int!
+  subTimelines: [Timeline!]
   # @hasInverse(field: commentOn)
 }
 
-type Message {
-  id: ID!
-  text: String
-  fileURL: String
-  messageBy: User!
-  messageOn: Chatboard!
-}
-
-type DeleteChatboard {
-  id: String!
-}
-
-type DeleteMessage {
+type DeleteTimeline {
   id: String!
 }
 
@@ -47,62 +36,41 @@ enum Status {
 }
 
 # Inputs Fetch
-input FetchChatboard {
-  id: String!
-}
-
-input FetchMessage {
+input Fetch {
   id: String!
 }
 
 # Input Create
-input NewChatboard {
-  name: String!
-  imageURL: String!
-  description: String
-  # @hasInverse(field: commentOn)
-}
-
-input NewMessage {
+input NewTimeline {
+  postedBy: String!
+  postedOn: String!
+  imageURL: String
   text: String
-  fileURL: String
-  messageBy: ID!
-  messageOn: ID!
+  like: Int!
 }
 
 # Input Update
-input UpdateChatboard {
+input UpdateTimeline {
   name: String
   imageURL: String
-  description: String
-  # members: [User!]
-  # messages: [Message!]
-  # @hasInverse(field: commentOn)
-}
-
-input UpdateMessage {
   text: String
-  fileURL: String
+  subTimeline: String
 }
 
 # Queries and Mutations
 type Query {
   # Multiple Queries
-  chatboards: [Chatboard!]!
-  messages: [Message!]!
+  timelinesByParent(input: Fetch!): [Timeline!]!
+  timelinesByUser(input: Fetch!): [Timeline!]!
   # Single Queries
-  chatboard(input: FetchChatboard!): Chatboard!
-  message(input: FetchMessage!): Message!
+  timeline(input: Fetch!): Timeline!
 }
 
 type Mutation {
   # Create
-  createChatboard(input: NewChatboard!): Chatboard!
-  createMessage(input: NewMessage!): Message!
+  createTimeline(input: NewTimeline!): Timeline!
   # Update
-  updateChatboard(id: ID!, input: UpdateChatboard!): Chatboard!
-  updateMessage(id: ID!, input: UpdateMessage!): Message!
+  updateTimeline(id: ID!, input: UpdateTimeline!): Timeline!
   # Delete
-  deleteChatboard(id: ID!): DeleteChatboard!
-  deleteMessage(id: ID!): DeleteMessage!
+  deleteTimeline(id: ID!): DeleteTimeline!
 }

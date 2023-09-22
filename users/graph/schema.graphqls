@@ -9,6 +9,7 @@ type User {
   avatarImageURL: String!
   password: String!
   posts: [Post!]
+  chatBoards: [Chatboard!]
   # @hasInverse(field: postedBy)
   following: [User]
   # @hasInverse(field: followers)
