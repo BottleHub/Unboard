@@ -99,6 +99,20 @@ func (db *DB) deleteHelper(collectionName string, ID string) error {
 	return err
 }
 
+func (db *DB) updateHelper(collectionName, ID string, info bson.M, model any) error {
+	collection, ctx := db.ctxDeferHelper(collectionName)
+	_id, _ := primitive.ObjectIDFromHex(ID)
+	filter := bson.M{"_id": _id}
+	update := bson.M{"$set": info}
+
+	results := collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
+	if err := results.Decode(model); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
 func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, error) {
 	res, err := db.resErrHelper("chatboards", input)
 
@@ -146,16 +160,53 @@ func (db *DB) SingleChatboard(ID string) (*model.Chatboard, error) {
 	return chatboard, err
 }
 
-func (db *DB) DeleteMessage(ID string) (*model.DeleteMessage, error) {
-	err := db.deleteHelper("messages", ID)
-	var delete *model.DeleteMessage
+func (db *DB) UpdateChatboard(ID string, input *model.UpdateChatboard) (*model.Chatboard, error) {
+	var chatboard *model.Chatboard
 
-	return delete, err
+	updateInfo := bson.M{}
+
+	if input.Description != nil {
+		updateInfo["description"] = input.Description
+	}
+	if input.ImageURL != nil {
+		updateInfo["imageURL"] = input.ImageURL
+	}
+	if input.Name != nil {
+		updateInfo["name"] = input.Name
+	}
+
+	err := db.updateHelper("chatboard", ID, updateInfo, chatboard)
+
+	return chatboard, err
+}
+
+func (db *DB) UpdateMessage(ID string, input *model.UpdateMessage) (*model.Message, error) {
+	var message *model.Message
+
+	updateInfo := bson.M{}
+
+	if input.FileURL != nil {
+		updateInfo["fileURL"] = input.FileURL
+	}
+	if input.Text != nil {
+		updateInfo["text"] = input.Text
+	}
+
+	err := db.updateHelper("chatboard", ID, updateInfo, message)
+
+	return message, err
 }
 
 func (db *DB) DeleteChatboard(ID string) (*model.DeleteChatboard, error) {
 	err := db.deleteHelper("messages", ID)
 	var delete *model.DeleteChatboard
+
+	return delete, err
+}
+
+func (db *DB) DeleteMessage(ID string) (*model.DeleteMessage, error) {
+	err := db.deleteHelper("messages", ID)
+	var delete *model.DeleteMessage
 
 	return delete, err
 }

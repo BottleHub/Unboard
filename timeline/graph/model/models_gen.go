@@ -8,61 +8,37 @@ import (
 	"strconv"
 )
 
-type Chatboard struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	ImageURL    string     `json:"imageURL"`
-	Description *string    `json:"description,omitempty"`
-	Members     []*User    `json:"members,omitempty"`
-	Messages    []*Message `json:"messages,omitempty"`
-}
-
-type DeleteChatboard struct {
+type DeleteTimeline struct {
 	ID string `json:"id"`
 }
 
-type DeleteMessage struct {
+type Fetch struct {
 	ID string `json:"id"`
 }
 
-type FetchChatboard struct {
-	ID string `json:"id"`
+type NewTimeline struct {
+	PostedBy string  `json:"postedBy"`
+	PostedOn string  `json:"postedOn"`
+	ImageURL *string `json:"imageURL,omitempty"`
+	Text     *string `json:"text,omitempty"`
+	Like     int     `json:"like"`
 }
 
-type FetchMessage struct {
-	ID string `json:"id"`
+type Timeline struct {
+	ID           string      `json:"id"`
+	PostedBy     *User       `json:"postedBy"`
+	PostedOn     *Timeline   `json:"postedOn"`
+	ImageURL     *string     `json:"imageURL,omitempty"`
+	Text         *string     `json:"text,omitempty"`
+	Likes        int         `json:"likes"`
+	SubTimelines []*Timeline `json:"subTimelines,omitempty"`
 }
 
-type Message struct {
-	ID        string     `json:"id"`
-	Text      *string    `json:"text,omitempty"`
-	FileURL   *string    `json:"fileURL,omitempty"`
-	MessageBy *User      `json:"messageBy"`
-	MessageOn *Chatboard `json:"messageOn"`
-}
-
-type NewChatboard struct {
-	Name        string  `json:"name"`
-	ImageURL    string  `json:"imageURL"`
-	Description *string `json:"description,omitempty"`
-}
-
-type NewMessage struct {
-	Text      *string `json:"text,omitempty"`
-	FileURL   *string `json:"fileURL,omitempty"`
-	MessageBy string  `json:"messageBy"`
-	MessageOn string  `json:"messageOn"`
-}
-
-type UpdateChatboard struct {
+type UpdateTimeline struct {
 	Name        *string `json:"name,omitempty"`
 	ImageURL    *string `json:"imageURL,omitempty"`
-	Description *string `json:"description,omitempty"`
-}
-
-type UpdateMessage struct {
-	Text    *string `json:"text,omitempty"`
-	FileURL *string `json:"fileURL,omitempty"`
+	Text        *string `json:"text,omitempty"`
+	SubTimeline *string `json:"subTimeline,omitempty"`
 }
 
 type User struct {

@@ -33,7 +33,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Starts the server process
 func main() {
-	ch := make(chan string, 3)
+	ch := make(chan string, 7)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -42,16 +42,13 @@ func main() {
 
 	//gin.SetMode(gin.ReleaseMode)
 
-	//router := chi.NewRouter()
-	//router.Use(auth.Middleware("phrase"))
-
 	route := gin.Default()
 
-	routes.Route(route)
+	go routes.Route(route)
 
-	route.GET("/")
-	route.POST("/query", graphqlHandler())
-	route.GET("/graphql", playgroundHandler())
+	go route.GET("/")
+	go route.POST("/query", graphqlHandler())
+	go route.GET("/graphql", playgroundHandler())
 	go mq.Consume()
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)

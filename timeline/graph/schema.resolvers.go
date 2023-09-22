@@ -12,58 +12,29 @@ import (
 	"github.com/bottlehub/unboard/boards/internals/database"
 )
 
-// CreateChatboard is the resolver for the createChatboard field.
-func (r *mutationResolver) CreateChatboard(ctx context.Context, input model.NewChatboard) (*model.Chatboard, error) {
-	chatboard, err := db.CreateChatboard(&input)
-	return chatboard, err
+// CreateTimeline is the resolver for the createTimeline field.
+func (r *mutationResolver) CreateTimeline(ctx context.Context, input model.NewTimeline) (*model.Timeline, error) {
+	panic(fmt.Errorf("not implemented: CreateTimeline - createTimeline"))
 }
 
-// CreateMessage is the resolver for the createMessage field.
-func (r *mutationResolver) CreateMessage(ctx context.Context, input model.NewMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: CreateMessage - createMessage"))
+// UpdateTimeline is the resolver for the updateTimeline field.
+func (r *mutationResolver) UpdateTimeline(ctx context.Context, id string, input model.UpdateTimeline) (*model.Timeline, error) {
+	panic(fmt.Errorf("not implemented: UpdateTimeline - updateTimeline"))
 }
 
-// UpdateChatboard is the resolver for the updateChatboard field.
-func (r *mutationResolver) UpdateChatboard(ctx context.Context, id string, input model.UpdateChatboard) (*model.Chatboard, error) {
-	panic(fmt.Errorf("not implemented: UpdateChatboard - updateChatboard"))
+// DeleteTimeline is the resolver for the deleteTimeline field.
+func (r *mutationResolver) DeleteTimeline(ctx context.Context, id string) (*model.DeleteTimeline, error) {
+	panic(fmt.Errorf("not implemented: DeleteTimeline - deleteTimeline"))
 }
 
-// UpdateMessage is the resolver for the updateMessage field.
-func (r *mutationResolver) UpdateMessage(ctx context.Context, id string, input model.UpdateMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: UpdateMessage - updateMessage"))
+// Timelines is the resolver for the timelines field.
+func (r *queryResolver) Timelines(ctx context.Context, input model.Fetch) ([]*model.Timeline, error) {
+	panic(fmt.Errorf("not implemented: Timelines - timelines"))
 }
 
-// DeleteChatboard is the resolver for the deleteChatboard field.
-func (r *mutationResolver) DeleteChatboard(ctx context.Context, id string) (*model.DeleteChatboard, error) {
-	panic(fmt.Errorf("not implemented: DeleteChatboard - deleteChatboard"))
-}
-
-// DeleteMessage is the resolver for the deleteMessage field.
-func (r *mutationResolver) DeleteMessage(ctx context.Context, id string) (*model.DeleteMessage, error) {
-	panic(fmt.Errorf("not implemented: DeleteMessage - deleteMessage"))
-}
-
-// Chatboards is the resolver for the chatboards field.
-func (r *queryResolver) Chatboards(ctx context.Context) ([]*model.Chatboard, error) {
-	chatboards, err := db.GetChatboards()
-	return chatboards, err
-}
-
-// Messages is the resolver for the messages field.
-func (r *queryResolver) Messages(ctx context.Context) ([]*model.Message, error) {
-	messages, err := db.GetMessages()
-	return messages, err
-}
-
-// Chatboard is the resolver for the chatboard field.
-func (r *queryResolver) Chatboard(ctx context.Context, input model.FetchChatboard) (*model.Chatboard, error) {
-	chatboard, err := db.SingleChatboard(input.ID)
-	return chatboard, err
-}
-
-// Message is the resolver for the message field.
-func (r *queryResolver) Message(ctx context.Context, input model.FetchMessage) (*model.Message, error) {
-	panic(fmt.Errorf("not implemented: Message - message"))
+// Timeline is the resolver for the timeline field.
+func (r *queryResolver) Timeline(ctx context.Context, input model.Fetch) (*model.Timeline, error) {
+	panic(fmt.Errorf("not implemented: Timeline - timeline"))
 }
 
 // Mutation returns MutationResolver implementation.
@@ -82,5 +53,5 @@ type queryResolver struct{ *Resolver }
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
 var (
-	db = database.ConnectDB()
+	db, _ = database.ConnectDB()
 )

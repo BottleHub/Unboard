@@ -19,13 +19,7 @@ type DB struct {
 	client *mongo.Client
 }
 
-type User struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-func ConnectDB() *DB {
+func ConnectDB() (*DB, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -45,7 +39,7 @@ func ConnectDB() *DB {
 	}
 
 	fmt.Println("Connected to MongoDB!")
-	return &DB{client: client}
+	return &DB{client: client}, err
 }
 
 func colHelper(db *DB, collectionName string) *mongo.Collection {
@@ -72,15 +66,45 @@ func (db *DB) resErrHelper(collectionName string, input any) (*mongo.InsertOneRe
 	return res, err
 }
 
-func (db *DB) multipleFetchHelper(collectionName string) (*mongo.Cursor, context.Context) {
+func (db *DB) multipleFetchHelper(collectionName string, ID string, IDName string) (*mongo.Cursor, context.Context) {
 	collection, ctx := db.ctxDeferHelper(collectionName)
 
-	res, err := collection.Find(ctx, bson.M{})
+	objId, _ := primitive.ObjectIDFromHex(ID)
+
+	res, err := collection.Find(ctx, bson.M{IDName: objId})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return res, ctx
+}
+
+func (db *DB) deleteHelper(collectionName string, ID string) error {
+	collection, ctx := db.ctxDeferHelper("messages")
+
+	objId, _ := primitive.ObjectIDFromHex(ID)
+	filter := bson.M{"_id": objId}
+
+	_, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	return err
+}
+
+func (db *DB) updateHelper(collectionName, ID string, info bson.M, model any) error {
+	collection, ctx := db.ctxDeferHelper(collectionName)
+	_id, _ := primitive.ObjectIDFromHex(ID)
+	filter := bson.M{"_id": _id}
+	update := bson.M{"$set": info}
+
+	results := collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
+	if err := results.Decode(model); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
 }
 
 func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, error) {
@@ -93,66 +117,67 @@ func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, erro
 	return chatboard, err
 }
 
-func (db *DB) CreateMessage(input *model.NewMessage) (*model.Message, error) {
-	res, err := db.resErrHelper("messages", input)
-
-	message := &model.Message{
-		ID: res.InsertedID.(primitive.ObjectID).Hex(),
-	}
-
-	return message, err
-}
-
-func (db *DB) GetChatboards() ([]*model.Chatboard, error) {
-	res, ctx := db.multipleFetchHelper("chatboards")
+func (db *DB) GetTimelines(ID string) ([]*model.Timeline, error) {
+	res, ctx := db.multipleFetchHelper("timeline", ID, "parentID")
 	var (
-		chatboards []*model.Chatboard
-		err        error
-	)
-
-	defer res.Close(ctx)
-
-	if err = res.All(context.TODO(), &chatboards); err != nil {
-		panic(err)
-	}
-
-	return chatboards, err
-}
-
-func (db *DB) GetMessages() ([]*model.Message, error) {
-	res, ctx := db.multipleFetchHelper("messages")
-	var (
-		messages []*model.Message
+		timeline []*model.Timeline
 		err      error
 	)
 
 	defer res.Close(ctx)
 
-	if err = res.All(context.TODO(), messages); err != nil {
+	if err = res.All(context.TODO(), timeline); err != nil {
 		panic(err)
 	}
 
-	return messages, err
+	return timeline, err
 }
 
-func (db *DB) SingleChatboard(ID string) (*model.Chatboard, error) {
+func (db *DB) SingleTimeline(ID string) (*model.Timeline, error) {
 	collection, ctx := db.ctxDeferHelper("chatboards")
-	var chatboard *model.Chatboard
+	var timeline *model.Timeline
 
 	objId, _ := primitive.ObjectIDFromHex(ID)
 
-	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&chatboard)
+	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&timeline)
 
-	return chatboard, err
+	return timeline, err
 }
 
-func (db *DB) SingleMessage(ID string) (*model.Message, error) {
-	collection, ctx := db.ctxDeferHelper("messages")
-	var message *model.Message
+func (db *DB) UpdateTimeline(ID string, input *model.UpdateTimeline) (*model.Timeline, error) {
+	var message *model.Timeline
 
-	objId, _ := primitive.ObjectIDFromHex(ID)
+	updateInfo := bson.M{}
 
-	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&message)
+	if input.ImageURL != nil {
+		updateInfo["imageURL"] = input.ImageURL
+	}
+	if input.Name != nil {
+		updateInfo["name"] = input.Name
+	}
+	if input.SubTimeline != nil {
+		timeline1, err := db.SingleChatboard(ID)
+		timeline2, err := db.SingleChatboard(*input.SubTimeline)
+		if err != nil {
+			panic(err)
+		}
+
+		arr := timeline1.SubTimelines
+		arr = append(arr, timeline2)
+		updateInfo["subTimeline"] = arr
+	}
+	if input.Text != nil {
+		updateInfo["text"] = input.Text
+	}
+
+	err := db.updateHelper("timeline", ID, updateInfo, message)
 
 	return message, err
+}
+
+func (db *DB) DeleteTimeline(ID string) (*model.DeleteTimeline, error) {
+	err := db.deleteHelper("timeline", ID)
+	var delete *model.DeleteTimeline
+
+	return delete, err
 }
