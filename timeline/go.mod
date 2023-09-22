@@ -3,11 +3,11 @@ module github.com/bottlehub/unboard/boards
 go 1.20
 
 require (
-	github.com/99designs/gqlgen v0.17.37
+	github.com/99designs/gqlgen v0.17.38
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	github.com/streadway/amqp v1.1.0
-	github.com/vektah/gqlparser/v2 v2.5.9
+	github.com/vektah/gqlparser/v2 v2.5.10
 	go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/crypto v0.13.0
 )

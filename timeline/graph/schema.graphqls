@@ -60,7 +60,8 @@ input UpdateTimeline {
 # Queries and Mutations
 type Query {
   # Multiple Queries
-  timelines(input: Fetch!): [Timeline!]!
+  timelinesByParent(input: Fetch!): [Timeline!]!
+  timelinesByUser(input: Fetch!): [Timeline!]!
   # Single Queries
   timeline(input: Fetch!): Timeline!
 }

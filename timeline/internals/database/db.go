@@ -107,18 +107,34 @@ func (db *DB) updateHelper(collectionName, ID string, info bson.M, model any) er
 	return nil
 }
 
-func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, error) {
+func (db *DB) CreateChatboard(input *model.NewTimeline) (*model.Timeline, error) {
 	res, err := db.resErrHelper("chatboards", input)
 
-	chatboard := &model.Chatboard{
+	chatboard := &model.Timeline{
 		ID: res.InsertedID.(primitive.ObjectID).Hex(),
 	}
 
 	return chatboard, err
 }
 
-func (db *DB) GetTimelines(ID string) ([]*model.Timeline, error) {
-	res, ctx := db.multipleFetchHelper("timeline", ID, "parentID")
+func (db *DB) GetTimelinesByParent(ID string) ([]*model.Timeline, error) {
+	res, ctx := db.multipleFetchHelper("timeline", ID, "postedOn")
+	var (
+		timeline []*model.Timeline
+		err      error
+	)
+
+	defer res.Close(ctx)
+
+	if err = res.All(context.TODO(), timeline); err != nil {
+		panic(err)
+	}
+
+	return timeline, err
+}
+
+func (db *DB) GetTimelinesByUser(ID string) ([]*model.Timeline, error) {
+	res, ctx := db.multipleFetchHelper("timeline", ID, "postedBy")
 	var (
 		timeline []*model.Timeline
 		err      error
@@ -156,8 +172,11 @@ func (db *DB) UpdateTimeline(ID string, input *model.UpdateTimeline) (*model.Tim
 		updateInfo["name"] = input.Name
 	}
 	if input.SubTimeline != nil {
-		timeline1, err := db.SingleChatboard(ID)
-		timeline2, err := db.SingleChatboard(*input.SubTimeline)
+		timeline1, err := db.SingleTimeline(ID)
+		if err != nil {
+			panic(err)
+		}
+		timeline2, err := db.SingleTimeline(*input.SubTimeline)
 		if err != nil {
 			panic(err)
 		}
