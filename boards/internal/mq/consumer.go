@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Consume(queue string) bool {
+func Consume(queue string) {
 	channel := Connect()
 	defer channel.Close()
 
@@ -29,5 +29,5 @@ func Consume(queue string) bool {
 	}()
 
 	fmt.Println(" [*] - Waiting for Messages")
-	return <-delay
+	<-delay
 }
