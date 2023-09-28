@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/bottlehub/unboard/boards/graph"
@@ -49,6 +49,9 @@ func main() {
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())
 	go route.GET("/graphql", playgroundHandler())
-	go fmt.Printf("Received: %s\n", mq.Consume("TestQueue"))
+	go mq.Consume("TestQueue")
+
+	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
+	go log.Fatal(route.Run(":" + port))
 	<-ch
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Consume(queue string) []byte {
+func Consume(queue string) bool {
 	channel := Connect()
 	defer channel.Close()
 
@@ -21,13 +21,13 @@ func Consume(queue string) []byte {
 		panic(err)
 	}
 
-	concur := make(chan []byte)
+	delay := make(chan bool)
 	go func() {
 		for d := range msgs {
-			concur <- d.Body
+			fmt.Printf("Received: %s\n", d.Body)
 		}
 	}()
 
 	fmt.Println(" [*] - Waiting for Messages")
-	return <-concur
+	return <-delay
 }
