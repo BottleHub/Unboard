@@ -1,13 +1,15 @@
 package mq
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func Consume() {
+func Consume(queue string) []byte {
 	channel := Connect()
 	defer channel.Close()
 
 	msgs, err := channel.Consume(
-		"TestQueue",
+		queue,
 		"",
 		true,
 		false,
@@ -19,13 +21,13 @@ func Consume() {
 		panic(err)
 	}
 
-	concur := make(chan bool)
+	concur := make(chan []byte)
 	go func() {
 		for d := range msgs {
-			fmt.Printf("Received: %s\n", d.Body)
+			concur <- d.Body
 		}
 	}()
 
 	fmt.Println(" [*] - Waiting for Messages")
-	<-concur
+	return <-concur
 }

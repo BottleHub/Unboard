@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -49,7 +50,7 @@ func main() {
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())
 	go route.GET("/graphql", playgroundHandler())
-	go mq.Consume()
+	go fmt.Printf("Received: %s\n", mq.Consume("TestQueue"))
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
 	go log.Fatal(route.Run(":" + port))

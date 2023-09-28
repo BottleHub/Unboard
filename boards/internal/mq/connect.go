@@ -13,7 +13,7 @@ func Connect() *amqp.Channel {
 		panic(err)
 	}
 
-	fmt.Println("Connected to RabbitMQ Insatnce Successfully")
+	fmt.Println("Connected to RabbitMQ Instance Successfully")
 
 	channel, err := connection.Channel()
 	if err != nil {
