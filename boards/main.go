@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/bottlehub/unboard/boards/graph"
-	"github.com/bottlehub/unboard/boards/internals/mq"
-	"github.com/bottlehub/unboard/boards/internals/routes"
+	"github.com/bottlehub/unboard/boards/internal/mq"
+	"github.com/bottlehub/unboard/boards/internal/routes"
 	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"

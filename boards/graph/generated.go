@@ -1315,14 +1315,11 @@ func (ec *executionContext) _Mutation_createChatboard(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Chatboard)
 	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
+	return ec.marshalOChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1384,14 +1381,11 @@ func (ec *executionContext) _Mutation_createMessage(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Message)
 	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalOMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1451,14 +1445,11 @@ func (ec *executionContext) _Mutation_updateChatboard(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Chatboard)
 	fc.Result = res
-	return ec.marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
+	return ec.marshalOChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1520,14 +1511,11 @@ func (ec *executionContext) _Mutation_updateMessage(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Message)
 	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalOMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1587,14 +1575,11 @@ func (ec *executionContext) _Mutation_deleteChatboard(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.DeleteChatboard)
 	fc.Result = res
-	return ec.marshalNDeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx, field.Selections, res)
+	return ec.marshalODeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteChatboard(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1646,14 +1631,11 @@ func (ec *executionContext) _Mutation_deleteMessage(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.DeleteMessage)
 	fc.Result = res
-	return ec.marshalNDeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx, field.Selections, res)
+	return ec.marshalODeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4487,44 +4469,26 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createChatboard(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createMessage":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMessage(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "updateChatboard":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateChatboard(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "updateMessage":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMessage(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "deleteChatboard":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteChatboard(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "deleteMessage":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMessage(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5057,34 +5021,6 @@ func (ec *executionContext) marshalNChatboard2ᚖgithubᚗcomᚋbottlehubᚋunbo
 	return ec._Chatboard(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteChatboard2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx context.Context, sel ast.SelectionSet, v model.DeleteChatboard) graphql.Marshaler {
-	return ec._DeleteChatboard(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx context.Context, sel ast.SelectionSet, v *model.DeleteChatboard) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteChatboard(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNDeleteMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx context.Context, sel ast.SelectionSet, v model.DeleteMessage) graphql.Marshaler {
-	return ec._DeleteMessage(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNDeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx context.Context, sel ast.SelectionSet, v *model.DeleteMessage) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteMessage(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNFetch2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐFetch(ctx context.Context, v interface{}) (model.Fetch, error) {
 	res, err := ec.unmarshalInputFetch(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5103,10 +5039,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNMessage2githubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v model.Message) graphql.Marshaler {
-	return ec._Message(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
@@ -5487,6 +5419,27 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐChatboard(ctx context.Context, sel ast.SelectionSet, v *model.Chatboard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Chatboard(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteChatboard2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteChatboard(ctx context.Context, sel ast.SelectionSet, v *model.DeleteChatboard) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteChatboard(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalODeleteMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐDeleteMessage(ctx context.Context, sel ast.SelectionSet, v *model.DeleteMessage) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._DeleteMessage(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5532,6 +5485,13 @@ func (ec *executionContext) marshalOMessage2ᚕᚖgithubᚗcomᚋbottlehubᚋunb
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋbottlehubᚋunboardᚋboardsᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Message(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

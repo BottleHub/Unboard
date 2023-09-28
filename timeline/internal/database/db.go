@@ -6,9 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/bottlehub/unboard/boards/configs"
-	"github.com/bottlehub/unboard/boards/graph/model"
-
+	"github.com/bottlehub/unboard/users/configs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

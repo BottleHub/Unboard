@@ -3,8 +3,10 @@ package auth
 import (
 	"context"
 	"net/http"
+	"strconv"
 
-	"github.com/bottlehub/unboard/configs"
+	"github.com/glyphack/graphlq-golang/internal/users"
+	"github.com/glyphack/graphlq-golang/pkg/jwt"
 )
 
 var userCtxKey = &contextKey{"user"}
@@ -13,7 +15,7 @@ type contextKey struct {
 	name string
 }
 
-func Middleware(secretKey string) func(http.Handler) http.Handler {
+func Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
@@ -24,37 +26,34 @@ func Middleware(secretKey string) func(http.Handler) http.Handler {
 				return
 			}
 
-			// Validate jwt token
+			//validate jwt token
 			tokenStr := header
-			username, err := configs.ParseToken(tokenStr, secretKey)
+			username, err := jwt.ParseToken(tokenStr)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusForbidden)
 				return
 			}
 
-			// Create user and check if user exists in db
-			user := configs.User{Username: username}
-			id, err := configs.ConnectDB().GetUserIdByUsername(username)
+			// create user and check if user exists in db
+			user := users.User{Username: username}
+			id, err := users.GetUserIdByUsername(username)
 			if err != nil {
 				next.ServeHTTP(w, r)
 				return
 			}
-			user.ID = id
+			user.ID = strconv.Itoa(id)
+			// put it in context
 			ctx := context.WithValue(r.Context(), userCtxKey, &user)
 
-			// Call the next with our new context
+			// and call the next with our new context
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
 	}
 }
 
-// Finds the user from the context. REQUIRES Middleware to have run.
-func FromContext(ctx context.Context) *configs.User {
-	raw, _ := ctx.Value(userCtxKey).(*configs.User)
+// ForContext finds the user from the context. REQUIRES Middleware to have run.
+func ForContext(ctx context.Context) *users.User {
+	raw, _ := ctx.Value(userCtxKey).(*users.User)
 	return raw
-}
-
-func main() {
-	
 }
