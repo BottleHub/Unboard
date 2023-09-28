@@ -25,6 +25,7 @@ func graphqlHandler() gin.HandlerFunc {
 
 // Redirects to fetching the graphql handle
 func playgroundHandler() gin.HandlerFunc {
+	go mq.Consume("TestQueue")
 	handle := playground.Handler("GraphQL", "/query")
 	return func(c *gin.Context) {
 		handle.ServeHTTP(c.Writer, c.Request)
@@ -33,7 +34,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Starts the server process
 func main() {
-	ch := make(chan string, 7)
+	ch := make(chan bool)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -49,7 +50,6 @@ func main() {
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())
 	go route.GET("/graphql", playgroundHandler())
-	go mq.Consume("TestQueue")
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
 	go log.Fatal(route.Run(":" + port))
