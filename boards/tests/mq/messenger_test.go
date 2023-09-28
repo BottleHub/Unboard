@@ -8,6 +8,6 @@ import (
 )
 
 func TestPublish(t *testing.T) {
-	err := mq.Publish("TestQueue", "testing...")
+	err := mq.Publish("TestQueue", "just testing...")
 	assert.NoError(t, err)
 }
