@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/bottlehub/unboard/boards/graph"
-	"github.com/bottlehub/unboard/boards/internals/mq"
-	"github.com/bottlehub/unboard/boards/internals/routes"
+	"github.com/bottlehub/unboard/boards/internal/mq"
+	"github.com/bottlehub/unboard/boards/internal/routes"
 	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -33,7 +33,7 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Starts the server process
 func main() {
-	ch := make(chan string, 7)
+	ch := make(chan bool)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -49,7 +49,7 @@ func main() {
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())
 	go route.GET("/graphql", playgroundHandler())
-	go mq.Consume()
+	go mq.Consume("TestQueue")
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
 	go log.Fatal(route.Run(":" + port))
