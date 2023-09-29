@@ -4,14 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/bottlehub/unboard/auth"
-	"github.com/bottlehub/unboard/graph"
-	"github.com/bottlehub/unboard/routes"
-	"github.com/gin-gonic/gin"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/go-chi/chi"
+	"github.com/bottlehub/unboard/users/graph"
+	"github.com/bottlehub/unboard/users/internal/mq"
+	"github.com/bottlehub/unboard/users/internal/routes"
+	"github.com/gin-gonic/gin"
 )
 
 const defaultPort = "8080"
@@ -34,23 +32,25 @@ func playgroundHandler() gin.HandlerFunc {
 
 // Starts the server process
 func main() {
+	ch := make(chan string, 7)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	router := chi.NewRouter()
-
-	router.Use(auth.Middleware("phrase"))
+	//gin.SetMode(gin.ReleaseMode)
 
 	route := gin.Default()
 
-	route.GET("/")
-	routes.Route(route)
+	go routes.Route(route)
 
-	route.POST("/query", graphqlHandler())
-	route.GET("/graphql", playgroundHandler())
+	go route.GET("/")
+	go route.POST("/query", graphqlHandler())
+	go route.GET("/graphql", playgroundHandler())
+	go mq.Consume()
 
-	log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
-	log.Fatal(route.Run(":" + port))
+	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
+	go log.Fatal(route.Run(":" + port))
+	<-ch
 }
