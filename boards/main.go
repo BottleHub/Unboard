@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -49,7 +50,37 @@ func main() {
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())
 	go route.GET("/graphql", playgroundHandler())
-	go mq.Consume("TestQueue")
+	go mq.Consume("TestQueue", func(s string) {
+		fmt.Println(s)
+	})
+	// go mq.Consume("CreateBoard", func(s string) {
+	// 	// Marshal string to json
+	// 	t, err := json.Marshal(s)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	// Get desc if available
+	// 	desc := ""
+	// 	if string(t[2]) != "" {
+	// 		desc = string(t[2])
+	// 	}
+
+	// 	// Create new model
+	// 	d := model.NewChatboard{
+	// 		Name:        string(t[0]),
+	// 		ImageURL:    string(t[1]),
+	// 		Description: &desc,
+	// 	}
+
+	// 	// Create new context and resolver
+	// 	ctx := new(context.Context)
+	// 	res := graph.Resolver{}
+	// 	// Create new request using context and model
+	// 	_, err = res.Mutation().CreateChatboard(*ctx, d)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// })
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
 	go log.Fatal(route.Run(":" + port))

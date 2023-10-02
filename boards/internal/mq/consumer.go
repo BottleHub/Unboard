@@ -2,9 +2,11 @@ package mq
 
 import (
 	"fmt"
+
+	"github.com/bottlehub/unboard/boards/internal"
 )
 
-func Consume(queue string) {
+func Consume(queue string, fn func(string)) {
 	channel := Connect()
 	defer channel.Close()
 
@@ -17,14 +19,13 @@ func Consume(queue string) {
 		false,
 		nil,
 	)
-	if err != nil {
-		panic(err)
-	}
+	internal.Handle(err)
 
 	delay := make(chan bool)
 	go func() {
 		for d := range msgs {
-			fmt.Printf("Received: %s\n", d.Body)
+			s := fmt.Sprintf("%s\n", d.Body)
+			fn(s)
 		}
 	}()
 

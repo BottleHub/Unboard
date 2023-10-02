@@ -3,6 +3,7 @@ package mq
 import (
 	"fmt"
 
+	"github.com/bottlehub/unboard/boards/internal"
 	"github.com/streadway/amqp"
 )
 
@@ -18,9 +19,7 @@ func Publish(queue string, message string) error {
 		false,
 		nil,
 	)
-	if err != nil {
-		panic(err)
-	}
+	internal.Handle(err)
 
 	fmt.Println(q)
 
@@ -34,9 +33,7 @@ func Publish(queue string, message string) error {
 			Body:        []byte(message),
 		},
 	)
-	if err != nil {
-		panic(err)
-	}
+	internal.Handle(err)
 
 	fmt.Println("Published Message to Queue")
 	return err

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bottlehub/unboard/boards/configs"
+	"github.com/bottlehub/unboard/boards/internal"
 	"github.com/streadway/amqp"
 )
 
@@ -16,9 +17,7 @@ func Connect() *amqp.Channel {
 	fmt.Println("Connected to RabbitMQ Instance Successfully")
 
 	channel, err := connection.Channel()
-	if err != nil {
-		panic(err)
-	}
+	internal.Handle(err)
 
 	return channel
 }
