@@ -120,7 +120,7 @@ input RefreshTokenInput {
 type Query {
   # Single Queries
   user(input: Fetch!): User!
-  links: [Link!]!
+  link: Link!
 }
 
 type Mutation {
