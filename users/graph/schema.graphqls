@@ -2,36 +2,25 @@
 type User {
   id: ID!
   username: String!
-  # @id
-  name: String!
-  about: String
-  email: String!
-  avatarImageURL: String!
-  password: String!
-  posts: [Post!]
+  key: String!
+  timelines: [Timeline!]
   chatBoards: [Chatboard!]
   # @hasInverse(field: postedBy)
-  following: [User]
+  following: [User!]
   # @hasInverse(field: followers)
-  followers: [User]
+  followers: [User!]
   # @hasInverse(field: following)
 }
 
-type Post {
+type Timeline {
   id: ID!
   postedBy: User!
+  postedOn: Timeline!
   imageURL: String
-  description: String
+  text: String
   likes: Int!
-  comments: [Comment!]
+  subTimelines: [Timeline!]
   # @hasInverse(field: commentOn)
-}
-
-type Comment {
-  id: String!
-  text: String!
-  commentBy: User!
-  commentOn: Post!
 }
 
 type Chatboard {
@@ -63,22 +52,6 @@ type DeleteUser {
   id: String!
 }
 
-type DeletePost {
-  id: String!
-}
-
-type DeleteComment {
-  id: String!
-}
-
-type DeleteChatboard {
-  id: String!
-}
-
-type DeleteMessage {
-  id: String!
-}
-
 type DeleteLink {
   id: String!
 }
@@ -91,25 +64,10 @@ enum Status {
 }
 
 # Inputs Fetch
-input FetchUser {
+input Fetch {
   id: String!
 }
 
-input FetchPost {
-  id: String!
-}
-
-input FetchComment {
-  id: String!
-}
-
-input FetchChatboard {
-  id: String!
-}
-
-input FetchMessage {
-  id: String!
-}
 
 # Input Create
 input NewUser {
@@ -119,34 +77,7 @@ input NewUser {
   about: String
   email: String!
   avatarImageURL: String!
-  password: String!
-}
-
-input NewPost {
-  postedBy: ID!
-  imageURL: String
-  description: String
-  likes: Int!
-}
-
-input NewComment {
-  text: String!
-  commentBy: ID!
-  commentOn: ID!
-}
-
-input NewChatboard {
-  name: String!
-  imageURL: String!
-  description: String
-  # @hasInverse(field: commentOn)
-}
-
-input NewMessage {
-  text: String
-  fileURL: String
-  messageBy: ID!
-  messageOn: ID!
+  key: String!
 }
 
 input NewLink {
@@ -162,37 +93,12 @@ input UpdateUser {
   about: String
   email: String
   avatarImageURL: String
-  password: String
-  # posts: [Post!]
+  timeline: ID
   # # @hasInverse(field: postedBy)
-  # following: [User]
+  following: ID
   # # @hasInverse(field: followers)
-  # followers: [User]
+  follower: ID
   # @hasInverse(field: following)
-}
-
-input UpdatePost {
-  likes: Int
-  # comments: [Comment!]
-  # @hasInverse(field: commentOn)
-}
-
-input UpdateComment {
-  text: String
-}
-
-input UpdateChatboard {
-  name: String
-  imageURL: String
-  description: String
-  # members: [User!]
-  # messages: [Message!]
-  # @hasInverse(field: commentOn)
-}
-
-input UpdateMessage {
-  text: String
-  fileURL: String
 }
 
 input UpdateLink {
@@ -212,42 +118,20 @@ input RefreshTokenInput {
 
 # Queries and Mutations
 type Query {
-  # Multiple Queries
-  users: [User!]!
-  posts: [Post!]!
-  comments: [Comment!]!
-  chatboards: [Chatboard!]!
-  messages: [Message!]!
   # Single Queries
-  user(input: FetchUser): User!
-  post(input: FetchPost): Post!
-  comment(input: FetchComment!): Comment!
-  chatboard(input: FetchChatboard!): Chatboard!
-  message(input: FetchMessage!): Message!
+  user(input: Fetch!): User!
   links: [Link!]!
 }
 
 type Mutation {
   # Create
   createUser(input: NewUser!): User!
-  createPost(input: NewPost!): Post!
-  createComment(input: NewComment!): Comment!
-  createChatboard(input: NewChatboard!): Chatboard!
-  createMessage(input: NewMessage!): Message!
   createLink(input: NewLink!): Link!
   # Update
   updateUser(id: ID!, input: UpdateUser!): User!
-  updatePost(id: ID!, input: UpdatePost!): Post!
-  updateComment(id: ID!, input: UpdateComment!): Comment!
-  updateChatboard(id: ID!, input: UpdateChatboard!): Chatboard!
-  updateMessage(id: ID!, input: UpdateMessage!): Message!
   updateLink(id: ID!, input: UpdateLink!): Link!
   # Delete
   deleteUser(id: ID!): DeleteUser!
-  deletePost(id: ID!): DeletePost!
-  deleteComment(id: ID!): DeleteComment!
-  deleteChatboard(id: ID!): DeleteChatboard!
-  deleteMessage(id: ID!): DeleteMessage!
   deleteLink(id: ID!): DeleteLink!
   # Misc
   login(input: Login!): String!

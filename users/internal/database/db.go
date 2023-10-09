@@ -71,12 +71,12 @@ func (db *DB) resErrHelper(collectionName string, input any) (*mongo.InsertOneRe
 	return res, err
 }
 
-func (db *DB) multipleFetchHelper(collectionName string, ID string, IDName string) (*mongo.Cursor, context.Context) {
+func (db *DB) multipleFetchHelper(collectionName string, ID string) (*mongo.Cursor, context.Context) {
 	collection, ctx := db.ctxDeferHelper(collectionName)
 
 	objId, _ := primitive.ObjectIDFromHex(ID)
 
-	res, err := collection.Find(ctx, bson.M{IDName: objId})
+	res, err := collection.Find(ctx, bson.M{ID: objId})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func (db *DB) deleteHelper(collectionName string, ID string) error {
 
 	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	return err
@@ -109,108 +109,98 @@ func (db *DB) updateHelper(collectionName, ID string, info bson.M) *mongo.Single
 	return results
 }
 
-func (db *DB) CreateChatboard(input *model.NewChatboard) (*model.Chatboard, error) {
-	res, err := db.resErrHelper("chatboards", input)
+func (db *DB) CreateUser(input *model.NewUser) (*model.User, error) {
+	res, err := db.resErrHelper("users", input)
 
-	chatboard := &model.Chatboard{
+	user := &model.User{
 		ID: res.InsertedID.(primitive.ObjectID).Hex(),
 	}
 
-	return chatboard, err
+	return user, err
 }
 
-func (db *DB) CreateMessage(input *model.NewMessage) (*model.Message, error) {
-	res, err := db.resErrHelper("messages", input)
-
-	message := &model.Message{
-		ID: res.InsertedID.(primitive.ObjectID).Hex(),
-	}
-
-	return message, err
-}
-
-func (db *DB) GetMessages(ID string) ([]*model.Message, error) {
-	res, ctx := db.multipleFetchHelper("messages", ID, "messageBy")
+func (db *DB) GetUsers(ID string) ([]*model.User, error) {
+	res, ctx := db.multipleFetchHelper("users", ID)
 	var (
-		messages []*model.Message
-		err      error
+		users []*model.User
+		err   error
 	)
 
 	defer res.Close(ctx)
 
-	if err = res.All(context.TODO(), messages); err != nil {
+	if err = res.All(context.TODO(), users); err != nil {
 		panic(err)
 	}
 
-	return messages, err
+	return users, err
 }
 
-func (db *DB) SingleChatboard(ID string) (*model.Chatboard, error) {
-	collection, ctx := db.ctxDeferHelper("chatboards")
-	var chatboard *model.Chatboard
+func (db *DB) SingleUser(ID string) (*model.User, error) {
+	collection, ctx := db.ctxDeferHelper("users")
+	var user *model.User
 
 	objId, _ := primitive.ObjectIDFromHex(ID)
 
-	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&chatboard)
+	err := collection.FindOne(ctx, bson.M{"_id": objId}).Decode(&user)
 
-	return chatboard, err
+	return user, err
 }
 
-func (db *DB) UpdateChatboard(ID string, input *model.UpdateChatboard) (*model.Chatboard, error) {
-	var chatboard *model.Chatboard
+func (db *DB) UpdateUser(ID string, input *model.UpdateUser) (*model.User, error) {
+	var user *model.User
 
 	updateInfo := bson.M{}
 
-	if input.Description != nil {
-		updateInfo["description"] = input.Description
+	if input.About != nil {
+		updateInfo["about"] = input.About
 	}
-	if input.ImageURL != nil {
-		updateInfo["imageURL"] = input.ImageURL
+	if input.AvatarImageURL != nil {
+		updateInfo["avatarImageURL"] = input.AvatarImageURL
 	}
 	if input.Name != nil {
 		updateInfo["name"] = input.Name
 	}
+	if input.Following != nil {
+		user1, err := db.SingleUser(ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		user2, err := db.SingleUser(*input.Following)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	results := db.updateHelper("chatboards", ID, updateInfo)
-	if err := results.Decode(&chatboard); err != nil {
+		arr := user1.Following
+		arr = append(arr, user2)
+		updateInfo["following"] = arr
+	}
+	if input.Follower != nil {
+		user1, err := db.SingleUser(ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		user2, err := db.SingleUser(*input.Follower)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		arr := user1.Followers
+		arr = append(arr, user2)
+		updateInfo["followers"] = arr
+	}
+
+	results := db.updateHelper("users", ID, updateInfo)
+	if err := results.Decode(&user); err != nil {
 		log.Fatal(err)
-		return chatboard, err
+		return user, err
 	}
 
-	return chatboard, nil
+	return user, nil
 }
 
-func (db *DB) UpdateMessage(ID string, input *model.UpdateMessage) (*model.Message, error) {
-	var message *model.Message
-
-	updateInfo := bson.M{}
-
-	if input.FileURL != nil {
-		updateInfo["fileURL"] = input.FileURL
-	}
-	if input.Text != nil {
-		updateInfo["text"] = input.Text
-	}
-
-	results := db.updateHelper("messages", ID, updateInfo)
-	if err := results.Decode(&message); err != nil {
-		log.Fatal(err)
-		return message, err
-	}
-
-	return message, nil
-}
-
-func (db *DB) DeleteChatboard(ID string) (*model.DeleteChatboard, error) {
-	err := db.deleteHelper("chatboards", ID)
-	var delete *model.DeleteChatboard
-
-	return delete, err
-}
-
-func (db *DB) DeleteMessage(ID string) (*model.DeleteMessage, error) {
-	err := db.deleteHelper("messages", ID)
-	var delete *model.DeleteMessage
+func (db *DB) DeleteUser(ID string) (*model.DeleteUser, error) {
+	err := db.deleteHelper("users", ID)
+	var delete *model.DeleteUser
 
 	return delete, err
 }

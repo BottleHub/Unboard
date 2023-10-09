@@ -18,6 +18,7 @@ type Chatboard {
   name: String!
   imageURL: String!
   description: String
+  admins: [User!]!
   members: [User!]
   messages: [Message!]
   # @hasInverse(field: commentOn)
@@ -56,6 +57,7 @@ input NewChatboard {
   name: String!
   imageURL: String!
   description: String
+  admins: [ID!]!
   # @hasInverse(field: commentOn)
 }
 
@@ -71,6 +73,7 @@ input UpdateChatboard {
   name: String
   imageURL: String
   description: String
+  admins: [ID!]
   # members: [User!]
   # messages: [Message!]
   # @hasInverse(field: commentOn)

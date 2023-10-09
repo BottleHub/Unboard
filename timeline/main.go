@@ -4,13 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/bottlehub/unboard/boards/graph"
-	"github.com/bottlehub/unboard/boards/internals/mq"
-	"github.com/bottlehub/unboard/boards/internals/routes"
-	"github.com/gin-gonic/gin"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/bottlehub/unboard/timelines/graph"
+	"github.com/bottlehub/unboard/timelines/internal/mq"
+	"github.com/bottlehub/unboard/timelines/internal/routes"
+	"github.com/gin-gonic/gin"
 )
 
 const defaultPort = "8080"
