@@ -3,11 +3,11 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/bottlehub/unboard/boards/configs"
 	"github.com/bottlehub/unboard/boards/graph/model"
+	"github.com/bottlehub/unboard/boards/internal"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -30,13 +30,9 @@ func ConnectDB() (*DB, error) {
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(configs.EnvMongoURI()))
-	if err != nil {
-		log.Fatal(err)
-	}
+	internal.Handle(err)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	internal.Handle(err)
 
 	//ping the database
 	err = client.Ping(ctx, nil)
@@ -65,9 +61,7 @@ func (db *DB) resErrHelper(collectionName string, input any) (*mongo.InsertOneRe
 
 	res, err := collection.InsertOne(ctx, input)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	internal.Handle(err)
 
 	return res, err
 }
@@ -78,9 +72,7 @@ func (db *DB) multipleFetchHelper(collectionName string, ID string, IDName strin
 	objId, _ := primitive.ObjectIDFromHex(ID)
 
 	res, err := collection.Find(ctx, bson.M{IDName: objId})
-	if err != nil {
-		log.Fatal(err)
-	}
+	internal.Handle(err)
 
 	return res, ctx
 }
@@ -92,9 +84,7 @@ func (db *DB) deleteHelper(collectionName string, ID string) error {
 	filter := bson.M{"_id": objId}
 
 	_, err := collection.DeleteOne(ctx, filter)
-	if err != nil {
-		panic(err)
-	}
+	internal.Handle(err)
 
 	return err
 }
@@ -131,7 +121,7 @@ func (db *DB) CreateMessage(input *model.NewMessage) (*model.Message, error) {
 }
 
 func (db *DB) GetMessages(ID string) ([]*model.Message, error) {
-	res, ctx := db.multipleFetchHelper("messages", ID, "messageBy")
+	res, ctx := db.multipleFetchHelper("messages", ID, "messageOn")
 	var (
 		messages []*model.Message
 		err      error
@@ -174,7 +164,7 @@ func (db *DB) UpdateChatboard(ID string, input *model.UpdateChatboard) (*model.C
 
 	results := db.updateHelper("chatboards", ID, updateInfo)
 	if err := results.Decode(&chatboard); err != nil {
-		log.Fatal(err)
+		internal.Handle(err)
 		return chatboard, err
 	}
 
@@ -195,7 +185,7 @@ func (db *DB) UpdateMessage(ID string, input *model.UpdateMessage) (*model.Messa
 
 	results := db.updateHelper("messages", ID, updateInfo)
 	if err := results.Decode(&message); err != nil {
-		log.Fatal(err)
+		internal.Handle(err)
 		return message, err
 	}
 

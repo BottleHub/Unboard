@@ -3,7 +3,7 @@ package mq_test
 import (
 	"testing"
 
-	"github.com/bottlehub/unboard/boards/internals/mq"
+	"github.com/bottlehub/unboard/users/internal/mq"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,4 +1,4 @@
-package configs
+package hash
 
 import "golang.org/x/crypto/bcrypt"
 

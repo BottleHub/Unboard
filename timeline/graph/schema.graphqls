@@ -7,9 +7,9 @@ type User {
   about: String
   avatarImageURL: String!
   # @hasInverse(field: postedBy)
-  following: [User]
+  following: [User!]
   # @hasInverse(field: followers)
-  followers: [User]
+  followers: [User!]
   # @hasInverse(field: following)
 }
 
@@ -54,7 +54,7 @@ input UpdateTimeline {
   name: String
   imageURL: String
   text: String
-  subTimeline: String
+  subTimelines: String!
 }
 
 # Queries and Mutations

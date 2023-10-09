@@ -3,7 +3,7 @@ package mq
 import (
 	"fmt"
 
-	"github.com/bottlehub/unboard/boards/configs"
+	"github.com/bottlehub/unboard/timelines/configs"
 	"github.com/streadway/amqp"
 )
 
