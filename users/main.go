@@ -8,7 +8,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/bottlehub/unboard/users/graph"
 	"github.com/bottlehub/unboard/users/internal/mq"
-	"github.com/bottlehub/unboard/users/internal/routes"
+	"github.com/bottlehub/unboard/users/internal/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,16 +41,16 @@ func main() {
 
 	//gin.SetMode(gin.ReleaseMode)
 
-	route := gin.Default()
+	r := gin.Default()
 
-	go routes.Route(route)
+	go router.Route(r)
 
-	go route.GET("/")
-	go route.POST("/query", graphqlHandler())
-	go route.GET("/graphql", playgroundHandler())
+	go r.GET("/")
+	go r.POST("/query", graphqlHandler())
+	go r.GET("/graphql", playgroundHandler())
 	go mq.Consume()
 
 	go log.Printf("Connect to http://localhost:%s/graphql for GraphQL playground", port)
-	go log.Fatal(route.Run(":" + port))
+	go log.Fatal(r.Run(":" + port))
 	<-ch
 }

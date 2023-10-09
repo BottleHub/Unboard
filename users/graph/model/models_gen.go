@@ -89,6 +89,7 @@ type UpdateUser struct {
 	Email          *string `json:"email,omitempty"`
 	AvatarImageURL *string `json:"avatarImageURL,omitempty"`
 	Timeline       *string `json:"timeline,omitempty"`
+	ChatBoard      *string `json:"chatBoard,omitempty"`
 	Following      *string `json:"following,omitempty"`
 	Follower       *string `json:"follower,omitempty"`
 }
