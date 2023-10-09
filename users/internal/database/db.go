@@ -8,6 +8,8 @@ import (
 
 	"github.com/bottlehub/unboard/users/configs"
 	"github.com/bottlehub/unboard/users/graph/model"
+	"github.com/bottlehub/unboard/users/internal"
+	"github.com/machinebox/graphql"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -109,6 +111,16 @@ func (db *DB) updateHelper(collectionName, ID string, info bson.M) *mongo.Single
 	return results
 }
 
+func (db *DB) queryHelper(client *graphql.Client, query string) *model.Chatboard {
+	var response model.Chatboard
+	request := graphql.NewRequest(query)
+	if err := client.Run(context.Background(), request, &response); err != nil {
+		internal.Handle(err)
+	}
+
+	return &response
+}
+
 func (db *DB) CreateUser(input *model.NewUser) (*model.User, error) {
 	res, err := db.resErrHelper("users", input)
 
@@ -187,6 +199,32 @@ func (db *DB) UpdateUser(ID string, input *model.UpdateUser) (*model.User, error
 		arr := user1.Followers
 		arr = append(arr, user2)
 		updateInfo["followers"] = arr
+	}
+	if input.ChatBoard != nil {
+		client := graphql.NewClient("https://")
+		query := `
+		{
+			user(username:"brianmmdev") {
+				publication {
+					posts {
+						_id
+						title
+						dateAdded
+					}
+				}
+			}
+		}
+		`
+
+		user1, err := db.SingleUser(ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		chatboard := db.queryHelper(client, query)
+
+		arr := user1.ChatBoards
+		arr = append(arr, chatboard)
+		updateInfo["chatboards"] = arr
 	}
 
 	results := db.updateHelper("users", ID, updateInfo)
