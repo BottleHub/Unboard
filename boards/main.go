@@ -7,7 +7,7 @@ import (
 
 	"github.com/bottlehub/unboard/boards/graph"
 	"github.com/bottlehub/unboard/boards/internal/mq"
-	"github.com/bottlehub/unboard/boards/internal/routes"
+	"github.com/bottlehub/unboard/boards/internal/router"
 	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -45,7 +45,7 @@ func main() {
 
 	route := gin.Default()
 
-	go routes.Route(route)
+	go router.Route(route)
 
 	go route.GET("/")
 	go route.POST("/query", graphqlHandler())

@@ -3,7 +3,7 @@ package database_test
 import (
 	"testing"
 
-	"github.com/bottlehub/unboard/boards/internals/database"
+	"github.com/bottlehub/unboard/users/internal/database"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,4 +1,4 @@
-module github.com/bottlehub/unboard/boards
+module github.com/bottlehub/unboard/timelines
 
 go 1.20
 

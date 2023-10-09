@@ -17,30 +17,7 @@ type Chatboard struct {
 	Messages    []*Message `json:"messages,omitempty"`
 }
 
-type Comment struct {
-	ID        string `json:"id"`
-	Text      string `json:"text"`
-	CommentBy *User  `json:"commentBy"`
-	CommentOn *Post  `json:"commentOn"`
-}
-
-type DeleteChatboard struct {
-	ID string `json:"id"`
-}
-
-type DeleteComment struct {
-	ID string `json:"id"`
-}
-
 type DeleteLink struct {
-	ID string `json:"id"`
-}
-
-type DeleteMessage struct {
-	ID string `json:"id"`
-}
-
-type DeletePost struct {
 	ID string `json:"id"`
 }
 
@@ -48,23 +25,7 @@ type DeleteUser struct {
 	ID string `json:"id"`
 }
 
-type FetchChatboard struct {
-	ID string `json:"id"`
-}
-
-type FetchComment struct {
-	ID string `json:"id"`
-}
-
-type FetchMessage struct {
-	ID string `json:"id"`
-}
-
-type FetchPost struct {
-	ID string `json:"id"`
-}
-
-type FetchUser struct {
+type Fetch struct {
 	ID string `json:"id"`
 }
 
@@ -88,35 +49,9 @@ type Message struct {
 	MessageOn *Chatboard `json:"messageOn"`
 }
 
-type NewChatboard struct {
-	Name        string  `json:"name"`
-	ImageURL    string  `json:"imageURL"`
-	Description *string `json:"description,omitempty"`
-}
-
-type NewComment struct {
-	Text      string `json:"text"`
-	CommentBy string `json:"commentBy"`
-	CommentOn string `json:"commentOn"`
-}
-
 type NewLink struct {
 	Title   string `json:"title"`
 	Address string `json:"address"`
-}
-
-type NewMessage struct {
-	Text      *string `json:"text,omitempty"`
-	FileURL   *string `json:"fileURL,omitempty"`
-	MessageBy string  `json:"messageBy"`
-	MessageOn string  `json:"messageOn"`
-}
-
-type NewPost struct {
-	PostedBy    string  `json:"postedBy"`
-	ImageURL    *string `json:"imageURL,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Likes       int     `json:"likes"`
 }
 
 type NewUser struct {
@@ -125,44 +60,26 @@ type NewUser struct {
 	About          *string `json:"about,omitempty"`
 	Email          string  `json:"email"`
 	AvatarImageURL string  `json:"avatarImageURL"`
-	Password       string  `json:"password"`
-}
-
-type Post struct {
-	ID          string     `json:"id"`
-	PostedBy    *User      `json:"postedBy"`
-	ImageURL    *string    `json:"imageURL,omitempty"`
-	Description *string    `json:"description,omitempty"`
-	Likes       int        `json:"likes"`
-	Comments    []*Comment `json:"comments,omitempty"`
+	Key            string  `json:"key"`
 }
 
 type RefreshTokenInput struct {
 	Token string `json:"token"`
 }
 
-type UpdateChatboard struct {
-	Name        *string `json:"name,omitempty"`
-	ImageURL    *string `json:"imageURL,omitempty"`
-	Description *string `json:"description,omitempty"`
-}
-
-type UpdateComment struct {
-	Text *string `json:"text,omitempty"`
+type Timeline struct {
+	ID           string      `json:"id"`
+	PostedBy     *User       `json:"postedBy"`
+	PostedOn     *Timeline   `json:"postedOn"`
+	ImageURL     *string     `json:"imageURL,omitempty"`
+	Text         *string     `json:"text,omitempty"`
+	Likes        int         `json:"likes"`
+	SubTimelines []*Timeline `json:"subTimelines,omitempty"`
 }
 
 type UpdateLink struct {
 	Title   *string `json:"title,omitempty"`
 	Address *string `json:"address,omitempty"`
-}
-
-type UpdateMessage struct {
-	Text    *string `json:"text,omitempty"`
-	FileURL *string `json:"fileURL,omitempty"`
-}
-
-type UpdatePost struct {
-	Likes *int `json:"likes,omitempty"`
 }
 
 type UpdateUser struct {
@@ -171,20 +88,19 @@ type UpdateUser struct {
 	About          *string `json:"about,omitempty"`
 	Email          *string `json:"email,omitempty"`
 	AvatarImageURL *string `json:"avatarImageURL,omitempty"`
-	Password       *string `json:"password,omitempty"`
+	Timeline       *string `json:"timeline,omitempty"`
+	Following      *string `json:"following,omitempty"`
+	Follower       *string `json:"follower,omitempty"`
 }
 
 type User struct {
-	ID             string  `json:"id"`
-	Username       string  `json:"username"`
-	Name           string  `json:"name"`
-	About          *string `json:"about,omitempty"`
-	Email          string  `json:"email"`
-	AvatarImageURL string  `json:"avatarImageURL"`
-	Password       string  `json:"password"`
-	Posts          []*Post `json:"posts,omitempty"`
-	Following      []*User `json:"following,omitempty"`
-	Followers      []*User `json:"followers,omitempty"`
+	ID         string       `json:"id"`
+	Username   string       `json:"username"`
+	Key        string       `json:"key"`
+	Timelines  []*Timeline  `json:"timelines,omitempty"`
+	ChatBoards []*Chatboard `json:"chatBoards,omitempty"`
+	Following  []*User      `json:"following,omitempty"`
+	Followers  []*User      `json:"followers,omitempty"`
 }
 
 type Status string
