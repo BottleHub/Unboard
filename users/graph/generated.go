@@ -5111,7 +5111,7 @@ func (ec *executionContext) unmarshalInputUpdateUser(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"username", "name", "about", "email", "avatarImageURL", "timeline", "following", "follower"}
+	fieldsInOrder := [...]string{"username", "name", "about", "email", "avatarImageURL", "timeline", "chatBoard", "following", "follower"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5172,6 +5172,15 @@ func (ec *executionContext) unmarshalInputUpdateUser(ctx context.Context, obj in
 				return it, err
 			}
 			it.Timeline = data
+		case "chatBoard":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chatBoard"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ChatBoard = data
 		case "following":
 			var err error
 

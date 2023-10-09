@@ -94,6 +94,7 @@ input UpdateUser {
   email: String
   avatarImageURL: String
   timeline: ID
+  chatBoard: ID
   # # @hasInverse(field: postedBy)
   following: ID
   # # @hasInverse(field: followers)
