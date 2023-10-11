@@ -202,9 +202,9 @@ func (db *DB) UpdateUser(ID string, input *model.UpdateUser) (*model.User, error
 	}
 	if input.ChatBoard != nil {
 		client := graphql.NewClient("https://")
-		query := `
+		query := fmt.Sprintf(`
 		{
-			user(username:"brianmmdev") {
+			input(ID: %s) {
 				publication {
 					posts {
 						_id
@@ -214,7 +214,7 @@ func (db *DB) UpdateUser(ID string, input *model.UpdateUser) (*model.User, error
 				}
 			}
 		}
-		`
+		`, *input.ChatBoard)
 
 		user1, err := db.SingleUser(ID)
 		if err != nil {
