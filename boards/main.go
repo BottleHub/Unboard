@@ -14,7 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
-const defaultPort = "8080"
+const defaultPort = "8090"
 
 // GraphQL handle helper
 func graphqlHandler() gin.HandlerFunc {
