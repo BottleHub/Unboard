@@ -201,17 +201,16 @@ func (db *DB) UpdateUser(ID string, input *model.UpdateUser) (*model.User, error
 		updateInfo["followers"] = arr
 	}
 	if input.ChatBoard != nil {
-		client := graphql.NewClient("https://")
+		client := graphql.NewClient("https://localhost:8090/graphql")
 		query := fmt.Sprintf(`
 		{
 			input(ID: %s) {
-				publication {
-					posts {
-						_id
-						title
-						dateAdded
-					}
-				}
+				id
+				name
+				imageURL
+				description
+				members
+				messages
 			}
 		}
 		`, *input.ChatBoard)
